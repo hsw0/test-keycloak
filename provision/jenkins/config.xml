@@ -1,0 +1,135 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<hudson>
+  <disabledAdministrativeMonitors>
+    <string>hudson.diagnosis.ReverseProxySetupMonitor</string>
+  </disabledAdministrativeMonitors>
+  <version>2.7.4</version>
+  <numExecutors>2</numExecutors>
+  <mode>NORMAL</mode>
+  <useSecurity>true</useSecurity>
+  <authorizationStrategy class="com.michelin.cio.hudson.plugins.rolestrategy.RoleBasedAuthorizationStrategy">
+    <roleMap type="projectRoles"/>
+    <roleMap type="globalRoles">
+      <role name="admin" pattern=".*">
+        <permissions>
+          <permission>hudson.model.View.Delete</permission>
+          <permission>hudson.model.Computer.Connect</permission>
+          <permission>hudson.model.Run.Delete</permission>
+          <permission>hudson.model.Hudson.UploadPlugins</permission>
+          <permission>com.cloudbees.plugins.credentials.CredentialsProvider.ManageDomains</permission>
+          <permission>hudson.model.Computer.Create</permission>
+          <permission>hudson.model.View.Configure</permission>
+          <permission>hudson.model.Hudson.ConfigureUpdateCenter</permission>
+          <permission>hudson.model.Computer.Build</permission>
+          <permission>hudson.model.Item.Configure</permission>
+          <permission>hudson.model.Hudson.Administer</permission>
+          <permission>hudson.model.Item.Cancel</permission>
+          <permission>hudson.model.Item.Read</permission>
+          <permission>com.cloudbees.plugins.credentials.CredentialsProvider.View</permission>
+          <permission>hudson.model.Computer.Delete</permission>
+          <permission>hudson.model.Item.Build</permission>
+          <permission>hudson.scm.SCM.Tag</permission>
+          <permission>hudson.model.Item.Move</permission>
+          <permission>hudson.model.Item.Discover</permission>
+          <permission>hudson.model.Hudson.Read</permission>
+          <permission>com.cloudbees.plugins.credentials.CredentialsProvider.Update</permission>
+          <permission>hudson.model.Item.Create</permission>
+          <permission>hudson.model.Item.Workspace</permission>
+          <permission>com.cloudbees.plugins.credentials.CredentialsProvider.Delete</permission>
+          <permission>hudson.model.Run.Replay</permission>
+          <permission>hudson.model.View.Read</permission>
+          <permission>hudson.model.Hudson.RunScripts</permission>
+          <permission>hudson.model.View.Create</permission>
+          <permission>hudson.model.Item.Delete</permission>
+          <permission>hudson.model.Computer.Configure</permission>
+          <permission>com.cloudbees.plugins.credentials.CredentialsProvider.Create</permission>
+          <permission>hudson.model.Computer.Disconnect</permission>
+          <permission>hudson.model.Run.Update</permission>
+        </permissions>
+        <assignedSIDs>
+          <sid>CI Admin</sid>
+          <sid>admin</sid>
+        </assignedSIDs>
+      </role>
+      <role name="ci-login" pattern=".*">
+        <permissions>
+          <permission>hudson.model.Hudson.Read</permission>
+          <permission>hudson.model.Item.Read</permission>
+          <permission>hudson.model.Item.Discover</permission>
+          <permission>hudson.model.View.Read</permission>
+        </permissions>
+        <assignedSIDs>
+          <sid>CI Login</sid>
+        </assignedSIDs>
+      </role>
+    </roleMap>
+    <roleMap type="slaveRoles"/>
+  </authorizationStrategy>
+  <securityRealm class="org.jenkinsci.plugins.saml.SamlSecurityRealm" plugin="saml@0.6">
+    <idpMetadata>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;EntityDescriptor entityID=&quot;https://keycloak.example.com/realms/example&quot;
+                   xmlns=&quot;urn:oasis:names:tc:SAML:2.0:metadata&quot;
+                   xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;&gt;
+   &lt;IDPSSODescriptor WantAuthnRequestsSigned=&quot;false&quot;
+      protocolSupportEnumeration=&quot;urn:oasis:names:tc:SAML:2.0:protocol&quot;&gt;
+   &lt;NameIDFormat&gt;urn:oasis:names:tc:SAML:2.0:nameid-format:persistent&lt;/NameIDFormat&gt;
+   &lt;NameIDFormat&gt;urn:oasis:names:tc:SAML:2.0:nameid-format:transient&lt;/NameIDFormat&gt;
+   &lt;NameIDFormat&gt;urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified&lt;/NameIDFormat&gt;
+   &lt;NameIDFormat&gt;urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress&lt;/NameIDFormat&gt;
+
+      &lt;SingleSignOnService Binding=&quot;urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST&quot;
+         Location=&quot;https://keycloak.example.com/realms/example/protocol/saml&quot; /&gt;
+      &lt;SingleSignOnService Binding=&quot;urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect&quot;
+         Location=&quot;https://keycloak.example.com/realms/example/protocol/saml&quot; /&gt;
+      &lt;SingleLogoutService
+         Binding=&quot;urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST&quot;
+         Location=&quot;https://keycloak.example.com/realms/example/protocol/saml&quot; /&gt;
+      &lt;SingleLogoutService
+         Binding=&quot;urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect&quot;
+         Location=&quot;https://keycloak.example.com/realms/example/protocol/saml&quot; /&gt;
+      &lt;KeyDescriptor use=&quot;signing&quot;&gt;
+          &lt;dsig:KeyInfo xmlns:dsig=&quot;http://www.w3.org/2000/09/xmldsig#&quot;&gt;
+              &lt;dsig:X509Data&gt;
+                  &lt;dsig:X509Certificate&gt;
+                      MIICnTCCAYUCBgFXMVasrTANBgkqhkiG9w0BAQsFADASMRAwDgYDVQQDDAdleGFtcGxlMB4XDTE2MDkxNjA0NTA0NloXDTI2MDkxNjA0NTIyNlowEjEQMA4GA1UEAwwHZXhhbXBsZTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAJNg8Kn/zVZrxpmHgzVt8ywPbMWwidkdjGRW/s+LsZbXM7lg1p+YdsqM0dElSqSxgs+eCqCVJI6+OELNgErsU7DjUTtFsYELd3Veo7BTUKbDUfzRYF5Q0vOE0JtyauSHAynxhVFn2/IND/5PjJRM17KFnOStCBqnuE6LCB3yB3nou0E4SCYoaLTSW1v+Jya6ra1L+wyVVS1euT3wjxQnvwld1lBPMVPcc6lFFjaDs0yzLW9TkhQaWxWU5UDEJXkHCCoVM41Y3P7osHqk0eetxRQxuAq/4FECwxVe2LClzNk96HRXnea24VWCAOa4wd6NK/FbGcJGVwSe0V4b4RjyIgsCAwEAATANBgkqhkiG9w0BAQsFAAOCAQEAR173Ah6R1d58V+YhdmQW6vn+PpSOh5RQ3YzXYF+0wM6PmmCn8EGBKFs4hw/BY2ujnZ7p6pnTQBqJ7/1XidUxSjn3akrZZiTUCbaNourT5cFw7tIp3/MSQeXjjxz5Y5FaO8okHoniy7McUiTIVCWuWYILD+MfcmCoQ7Yvn34LW2s6enqm251/XN6XVIxuEOfJdMhP2VwSrO99k76oFaAbxZMY5Ge3nurE8ijiiO0REnIBlN65AmqQudfdLY04m4ZhPTaHeQ3YHIFRlzLC5HPwD+V07W7yaxHqzdlCanJ0mLbtjEmKRrSdqJ6TjBB6FbdX7GRV78b8OQ5p59FU5+zM6w==
+                  &lt;/dsig:X509Certificate&gt;
+              &lt;/dsig:X509Data&gt;
+          &lt;/dsig:KeyInfo&gt;
+      &lt;/KeyDescriptor&gt;
+   &lt;/IDPSSODescriptor&gt;
+&lt;/EntityDescriptor&gt;</idpMetadata>
+    <displayNameAttributeName>http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name</displayNameAttributeName>
+    <groupsAttributeName>http://schemas.xmlsoap.org/claims/Group</groupsAttributeName>
+    <maximumAuthenticationLifetime>86400</maximumAuthenticationLifetime>
+    <usernameCaseConversion>none</usernameCaseConversion>
+  </securityRealm>
+  <disableRememberMe>false</disableRememberMe>
+  <projectNamingStrategy class="jenkins.model.ProjectNamingStrategy$DefaultProjectNamingStrategy"/>
+  <workspaceDir>${JENKINS_HOME}/workspace/${ITEM_FULLNAME}</workspaceDir>
+  <buildsDir>${ITEM_ROOTDIR}/builds</buildsDir>
+  <markupFormatter class="hudson.markup.EscapedMarkupFormatter"/>
+  <jdks/>
+  <viewsTabBar class="hudson.views.DefaultViewsTabBar"/>
+  <myViewsTabBar class="hudson.views.DefaultMyViewsTabBar"/>
+  <clouds/>
+  <quietPeriod>5</quietPeriod>
+  <scmCheckoutRetryCount>0</scmCheckoutRetryCount>
+  <views>
+    <hudson.model.AllView>
+      <owner class="hudson" reference="../../.."/>
+      <name>All</name>
+      <filterExecutors>false</filterExecutors>
+      <filterQueue>false</filterQueue>
+      <properties class="hudson.model.View$PropertyList"/>
+    </hudson.model.AllView>
+  </views>
+  <primaryView>All</primaryView>
+  <slaveAgentPort>-1</slaveAgentPort>
+  <label></label>
+  <crumbIssuer class="hudson.security.csrf.DefaultCrumbIssuer">
+    <excludeClientIPFromCrumb>true</excludeClientIPFromCrumb>
+  </crumbIssuer>
+  <nodeProperties/>
+  <globalNodeProperties/>
+  <noUsageStatistics>true</noUsageStatistics>
+</hudson>

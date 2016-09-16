@@ -12,6 +12,8 @@ yum install -y tmux vim-enhanced man man-pages
 
 /vagrant/provision/scripts/keycloak.sh
 
+/vagrant/provision/scripts/jenkins.sh
+
 while pgrep -f "openssl dhparam" > /dev/null ; do
 	echo "Waiting openssl dhparam to be finished..."
 	sleep 1;
