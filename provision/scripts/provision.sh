@@ -1,12 +1,22 @@
 #!/bin/bash
 
-. /vagrant/provision/scripts/common.sh
+set -e
 
-systemctl stop postfix.service
-systemctl disable postfix.service
+yum install -y epel-release
 
-yum_install epel-release
-yum_install tmux
-yum_install vim-enhanced gcc gcc-c++ automake autoconf patch libtool git
-yum_install unzip man man-pages
-yum_install nmap bind-utils
+# User friendly
+yum install -y tmux vim-enhanced man man-pages
+
+
+/vagrant/provision/scripts/nginx.sh
+
+/vagrant/provision/scripts/keycloak.sh
+
+while pgrep -f "openssl dhparam" > /dev/null ; do
+	echo "Waiting openssl dhparam to be finished..."
+	sleep 1;
+done
+
+systemctl restart nginx.service && systemctl enable nginx.service
+
+echo Provision finished.

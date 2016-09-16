@@ -7,6 +7,7 @@ Vagrant.configure(2) do |config|
   config.vm.provider "virtualbox" do |vb|
     vb.memory = "2048"
   end
+  config.vm.network "private_network", ip: "192.168.33.220"
   # prevent compromised vm overwriting vagrant files...
   config.vm.synced_folder ".", "/vagrant", type: "rsync",
     rsync__exclude: [ ".git", "shared" ]
