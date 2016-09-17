@@ -1,0 +1,28 @@
+dn: OU=World,DC=example,DC=com
+objectClass: top
+objectClass: organizationalUnit
+
+dn: OU=Computers,OU=World,DC=example,DC=com
+objectClass: top
+objectClass: organizationalUnit
+
+dn: OU=Users,OU=World,DC=example,DC=com
+objectClass: top
+objectClass: organizationalUnit
+
+dn: OU=Admin accounts,OU=World,DC=example,DC=com
+objectClass: top
+objectClass: organizationalUnit
+
+dn: OU=Service accounts,OU=World,DC=example,DC=com
+objectClass: top
+objectClass: organizationalUnit
+
+dn: OU=Groups,OU=World,DC=example,DC=com
+objectClass: top
+objectClass: organizationalUnit
+
+dn: OU=Underworld,DC=example,DC=com
+objectClass: top
+objectClass: organizationalUnit
+description: Deleted objects
