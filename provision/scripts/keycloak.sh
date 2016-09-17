@@ -48,6 +48,14 @@ if [ ! -e /srv/keycloak/standalone/data/keycloak.h2.db ]; then
 	echo "Login: admin"
 	echo "Password: $admin_password"
 	unset admin_password
+
+	echo "Importing example realm"
+	sudo -u keycloak /srv/keycloak/bin/standalone.sh -Dkeycloak.import=/vagrant/provision/keycloak/example-realm.json  &
+	sleep 60
+	while ! /srv/keycloak/bin/jboss-cli.sh --connect command=:shutdown ; do
+		echo "Waiting keycloak import job to be finished."
+		sleep 1
+	done
 fi
 
 if [ ! -f /etc/systemd/system/keycloak.service ]; then
