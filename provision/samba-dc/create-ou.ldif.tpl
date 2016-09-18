@@ -1,28 +1,28 @@
-dn: OU=World,DC=example,DC=com
+dn: OU=World,$BASEDN
 objectClass: top
 objectClass: organizationalUnit
 
-dn: OU=Computers,OU=World,DC=example,DC=com
+dn: OU=Computers,OU=World,$BASEDN
 objectClass: top
 objectClass: organizationalUnit
 
-dn: OU=Users,OU=World,DC=example,DC=com
+dn: OU=Users,OU=World,$BASEDN
 objectClass: top
 objectClass: organizationalUnit
 
-dn: OU=Admin accounts,OU=World,DC=example,DC=com
+dn: OU=Admin accounts,OU=World,$BASEDN
 objectClass: top
 objectClass: organizationalUnit
 
-dn: OU=Service accounts,OU=World,DC=example,DC=com
+dn: OU=Service accounts,OU=World,$BASEDN
 objectClass: top
 objectClass: organizationalUnit
 
-dn: OU=Groups,OU=World,DC=example,DC=com
+dn: OU=Groups,OU=World,$BASEDN
 objectClass: top
 objectClass: organizationalUnit
 
-dn: OU=Underworld,DC=example,DC=com
+dn: OU=Underworld,$BASEDN
 objectClass: top
 objectClass: organizationalUnit
 description: Deleted objects

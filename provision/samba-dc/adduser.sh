@@ -1,20 +1,10 @@
 #!/bin/bash
 
-set -e
+SAVED_OPTIONS=$(set +o)
+set +e
 
-ad_useradd () {
-	local ou="$1"
-	local upn="$2"
-	local password="$3"
-	local firstname="$4" ; local lastname="$5"
-
-	local email="$2" ; 
-	local username="${upn%@*}"
-
-	set +e
-	local LDIF_TPL
-	read -r -d '' LDIF_TPL <<-'EOF'
-	dn: CN=$cn,$USERS_OU
+read -r -d '' USERADD_LDIF_TPL <<-'EOF'
+	dn:: $dn
 	objectClass: top
 	objectClass: person
 	objectClass: organizationalPerson
@@ -28,14 +18,38 @@ ad_useradd () {
 	userPrincipalName: $upn
 	userAccountControl: 512
 	unicodePwd:: $password
-	EOF
-	set -e
+EOF
+
+read -r -d '' GROUPADD_LDIF_TPL <<-'EOF'
+	dn:: $dn
+	objectClass: top
+	objectClass: group
+	sAMAccountName: $sam_account_name
+EOF
+
+read -r -d '' GROUPMEMS_LDIF_TPL <<-'EOF'
+	dn:: $group_dn
+	changetype: modify
+	$op: member
+	member:: $user_dn
+EOF
+
+eval "$SAVED_OPTIONS"
+unset SAVED_OPTIONS
+
+ad_useradd () {
+	local ou="$1"
+	local upn="$2"
+	local password="$3"
+	local firstname="$4" ; local lastname="$5"
+
+	local email="$2" ; 
+	local username="${upn%@*}"
 
 	local password_enc=$(echo -n "\"$password\"" | iconv -f utf8 -t utf16le | base64)
 
-	echo "$LDIF_TPL" | sed -e "
-	s|\\\$cn|$username|;
-	s|\\\$USERS_OU|$ou|;
+	echo "$USERADD_LDIF_TPL" | sed -e "
+	s|\\\$dn|$(echo -n "CN=$username,$ou" | base64 -w 0)|;
 	s|\\\$username|$username|;
 	s|\\\$upn|$upn|;
 	s|\\\$givenName|$(echo -n "$firstname" | base64)|;
@@ -52,17 +66,7 @@ ad_groupadd () {
 	local cn="$2"
 	local sam_account_name="$3"  # Windows 2000 이전, UNIX
 
-	set +e
-	local LDIF_TPL
-	read -r -d '' LDIF_TPL <<-'EOF'
-	dn:: $dn
-	objectClass: top
-	objectClass: group
-	sAMAccountName: $sam_account_name
-	EOF
-	set -e
-
-	echo "$LDIF_TPL" | sed -e "
+	echo "$GROUPADD_LDIF_TPL" | sed -e "
 	s|\\\$dn|$(echo -n "CN=$cn,$ou" | base64 -w 0)|;
 	s|\\\$GROUPS_OU|$ou|;
 	s|\\\$sam_account_name|$sam_account_name|;
@@ -95,18 +99,7 @@ ad_groupmems () {
 		user_dn=$(echo "$user_dn" | cut -b3- | base64 --decode)
 	echo "$group_dn $user_dn"
 
-
-	set +e
-	local LDIF_TPL
-	read -r -d '' LDIF_TPL <<-'EOF'
-	dn:: $group_dn
-	changetype: modify
-	$op: member
-	member:: $user_dn
-	EOF
-	set -e
-
-	echo "$LDIF_TPL" | sed -e "
+	echo "$GROUPMEMS_LDIF_TPL" | sed -e "
 	s|\\\$op|$op|;
 	s|\\\$group_dn|$(echo -n "$group_dn" | base64 -w 0)|;
 	s|\\\$user_dn|$(echo -n "$user_dn" | base64 -w 0)|;
@@ -114,18 +107,3 @@ ad_groupmems () {
 	ldapmodify -h "$server" -Q -Y GSSAPI
 }
 
-
-
-server=dc1.example.com
-basedn='OU=World,DC=example,DC=com'
-
-ad_useradd "OU=Users,$basedn" 'hsw@syscall.io' 'test' '길동' '홍'
-ad_useradd "OU=Users,$basedn" 'test1@example.com' 'test' '꺽정' '임'
-ad_useradd "OU=Users,$basedn" 'test2@example.com' 'test' '길산' '장'
-
-ad_groupadd "OU=Groups,$basedn" 'CI Admin' 'ci-admin'
-ad_groupadd "OU=Groups,$basedn" 'CI Login' 'ci-login'
-
-ad_groupmems add 'ci-admin' 'hsw'
-ad_groupmems add 'ci-login' 'test1'
-ad_groupmems add 'ci-login' 'test2'

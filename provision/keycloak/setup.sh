@@ -1,17 +1,18 @@
 #!/bin/bash
 
+KEYCLOAK_VERSION=2.2.0.Final
+KEYCLOAK_ARCHIVE_NAME="keycloak-$KEYCLOAK_VERSION.tar.gz"
+KEYCLOAK_ARCHIVE_PATH="/vagrant/shared/$KEYCLOAK_ARCHIVE_NAME"
+
+. /vagrant/provision/scripts/common.sh
+
 set -e
 
-yum install -y java-1.8.0-openjdk-headless
-yum install -y java-1.8.0-openjdk-devel
+yum_install java-1.8.0-openjdk-headless
 
 if ! id keycloak &> /dev/null ; then
 	useradd --no-create-home --home-dir /srv/keycloak --system --shell /sbin/nologin keycloak
 fi
-
-KEYCLOAK_VERSION=2.2.0.Final
-KEYCLOAK_ARCHIVE_NAME="keycloak-$KEYCLOAK_VERSION.tar.gz"
-KEYCLOAK_ARCHIVE_PATH="/vagrant/shared/$KEYCLOAK_ARCHIVE_NAME"
 
 if [ ! -e /srv/keycloak ]; then
 	if [ ! -f "$KEYCLOAK_ARCHIVE_PATH" ]; then
@@ -51,16 +52,15 @@ if [ ! -e /srv/keycloak/standalone/data/keycloak.h2.db ]; then
 
 	echo "Importing example realm"
 	sudo -u keycloak /srv/keycloak/bin/standalone.sh -Dkeycloak.import=/vagrant/provision/keycloak/example-realm.json  &
-	sleep 60
+	sleep 30
 	while ! /srv/keycloak/bin/jboss-cli.sh --connect command=:shutdown ; do
 		echo "Waiting keycloak import job to be finished."
 		sleep 1
 	done
 fi
 
-if [ ! -f /etc/systemd/system/keycloak.service ]; then
-	cp /vagrant/provision/keycloak/keycloak.service /etc/systemd/system
-	systemctl daemon-reload
-fi
+cp -f /vagrant/provision/keycloak/keycloak.service /etc/systemd/system/
+systemctl daemon-reload
 
-systemctl restart keycloak.service && systemctl enable keycloak.service
+systemctl restart keycloak.service &&
+	systemctl enable keycloak.service

@@ -5,14 +5,14 @@ export JENKINS_UC=https://updates.jenkins.io
 
 set -e
 
-yum install -y java-1.8.0-openjdk-devel
+. /vagrant/provision/scripts/common.sh
 
 if ! rpm -qi jenkins > /dev/null ; then
 	wget -O /etc/yum.repos.d/jenkins.repo http://pkg.jenkins.io/redhat-stable/jenkins.repo
 	rpm --import http://pkg.jenkins.io/redhat-stable/jenkins.io.key
-
-	yum install -y jenkins unzip zip
 fi
+
+yum_install java-1.8.0-openjdk-devel jenkins unzip zip
 
 perl -pe 's|JENKINS_PORT="8080"|JENKINS_PORT="8081"|' -i /etc/sysconfig/jenkins
 
@@ -30,15 +30,26 @@ if [ ! -f $JENKINS_HOME/config.xml ]; then
 
 	install -d -o jenkins -g jenkins -m 755 "$JENKINS_HOME/plugins"
 
-	install_plugin $SUGGESTED_PLUGINS
-	install_plugin saml:0.6
-	install_plugin role-strategy:2.3.2
+	retries=5
+	for i in $(seq $retries) ; do
+		rm -rf $JENKINS_HOME/plugins/*.lock
+		install_plugin $SUGGESTED_PLUGINS saml:0.6 role-strategy:2.3.2 &&
+			break
+
+		if (( $i <= $retries )); then
+			echo "Plugin install failed. retrying $i/$retries.." >&2
+		else
+			echo "Max retries exceeded" >&2
+			exit 1
+		fi
+	done
+
 	chown -R jenkins:jenkins $JENKINS_HOME/plugins
 
 	rm -rf /usr/share/jenkins
 	rm -f /tmp/install-jenkins-plugin.sh /usr/local/bin/jenkins-support
 
-	install -o jenkins -g jenkins -m 644 /vagrant/provision/jenkins/config.xml $JENKINS_HOME/config.xml
+	install -o jenkins -g jenkins -m 644 /vagrant/provision/examples/jenkins/config.xml $JENKINS_HOME/config.xml
 fi
 
 systemctl restart jenkins.service && systemctl enable jenkins.service

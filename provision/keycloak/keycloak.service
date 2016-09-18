@@ -4,7 +4,7 @@ After=network.target
 
 [Service]
 Type=idle
-Environment=JBOSS_HOME=/srv/keycloak JBOSS_LOG_DIR=/var/log/keycloak "JAVA_OPTS=-Xms1024m -Xmx1536m -XX:MaxPermSize=768m"
+Environment=JBOSS_HOME=/srv/keycloak JBOSS_LOG_DIR=/var/log/keycloak
 User=keycloak
 Group=keycloak
 ExecStart=/srv/keycloak/bin/standalone.sh

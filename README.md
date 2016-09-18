@@ -9,6 +9,7 @@
 
 * Active Directory 사용자 연동
    - 계정/그룹 동기화
+      - Keycloak에서 계정 삭제시 LDAP에 반영. 그룹 삭제는 반영되지 않음
    - 암호 변경
    - LDAP / Kerberos 인증
 
@@ -17,19 +18,52 @@
    - 별도 인증 플로우 설정시 특정 Google Apps 도메인 사용자만 허용 가능
    - 이메일이 같은 기존 계정이 있을 경우 암호 인증 후 자동으로 IdP 연동
 
+### 안 해본 거
+   * 메일 발송
+   * TODO: Keycloak LDAP bind 계정 Administrator -> 서비스 계정으로 변경
+   * [Keycloak Security Proxy](https://keycloak.gitbooks.io/server-installation-and-configuration/content/v/2.2/topics/proxy.html)
+      - Reverse proxy
+      - 기존 애플리케이션 수정 없이 인증 붙일 수 있는 것 같다
+
+
 ### 이슈
+   - 프로비저닝 실패
+       - 네트워크, 타이밍 등 각종 이슈로 가끔 프로비저닝이 실패할 때가 있음. `vagrant provision VM명` 으로 재시도 하거나 날리고 새로 만들것.
    - Keycloak User Groups Retrieve Strategy 중 `LOAD_GROUPS_BY_MEMBER_ATTRIBUTE_RECURSIVELY` 는 예제로 설정한 Samba 4.3에서 제대로 작동하지 않음 [이슈](https://bugzilla.samba.org/show_bug.cgi?id=10493)
 
 
 ## 로컬 설정
 
+Vagrant 설치:
+
+```
+brew cask install vagrant
+```
+
+구동:
+
+```
+vagrant up
+```
+
+VM 셸 진입
+
+```
+vagrant ssh VM 명
+# ex) vagrant ssh keycloak
+```
+
 /etc/hosts:
 
 ```
-192.168.33.220	keycloak.example.com ci.example.com
+192.168.33.224	dc1.example.com
+192.168.33.225	keycloak.example.com
+192.168.33.226	ci.example.com
 ```
 
 ## Keycloak 설정
+
+* Vagrant VM: `keycloak`
 
 * URL: https://keycloak.example.com
 
@@ -46,15 +80,12 @@
 
 ## Samba 4 AD 설정
 
+* Vagrant VM: `dc1`
+
 * Domain: EXAMPLE.COM
 * Login: Administrator
 * Password: admin
 
-필요할 경우 아래 명령으로 셸 진입
-
-```
-docker exec -ti samba-dc /bin/bash -l
-```
 
 ### 테스트 계정 목록
 
