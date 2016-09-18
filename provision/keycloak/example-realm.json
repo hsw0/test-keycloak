@@ -33,7 +33,7 @@
   "codeSecret" : "86fb7ff4-959e-4e19-96fe-62fee9217f66",
   "roles" : {
     "realm" : [ {
-      "id" : "35eee2f7-d978-48ba-89b6-e40cf2b8dd13",
+      "id" : "066a482a-57d7-4765-a313-b22251ee8ada",
       "name" : "offline_access",
       "description" : "${role_offline-access}",
       "scopeParamRequired" : true,
@@ -41,7 +41,7 @@
       "clientRole" : false,
       "containerId" : "example"
     }, {
-      "id" : "5d329d4f-92a6-4374-8720-6be7646dbe60",
+      "id" : "db0182a8-c662-4396-aaf1-aa4964a55269",
       "name" : "uma_authorization",
       "description" : "${role_uma_authorization}",
       "scopeParamRequired" : false,
@@ -207,7 +207,7 @@
       } ]
     }
   },
-  "groups" : [  ],
+  "groups" : [ ],
   "defaultRoles" : [ "offline_access", "uma_authorization" ],
   "requiredCredentials" : [ "password" ],
   "passwordPolicy" : "hashIterations(20000)",
@@ -917,7 +917,7 @@
   },
   "smtpServer" : { },
   "userFederationProviders" : [ {
-    "id" : "d9f57841-2d83-46a3-875f-5e754564d31c",
+    "id" : "57047bb1-f55e-4da0-8135-11e8b1b5664b",
     "displayName" : "Active Directory",
     "providerName" : "ldap",
     "config" : {
@@ -929,15 +929,15 @@
       "useKerberosForPasswordAuthentication" : "true",
       "bindCredential" : "admin",
       "bindDn" : "Administrator@EXAMPLE.COM",
-      "usernameLDAPAttribute" : "cn",
+      "usernameLDAPAttribute" : "sAMAccountName",
       "vendor" : "ad",
       "uuidLDAPAttribute" : "objectGUID",
       "allowKerberosAuthentication" : "true",
       "connectionUrl" : "ldaps://dc1.example.com",
-      "syncRegistrations" : "false",
+      "syncRegistrations" : "true",
       "authType" : "simple",
       "debug" : "true",
-      "searchScope" : "1",
+      "searchScope" : "2",
       "keyTab" : "/etc/krb5.keytab.d/keycloak",
       "useTruststoreSpi" : "ldapsOnly",
       "kerberosRealm" : "EXAMPLE.COM",
@@ -949,10 +949,22 @@
     "priority" : 0,
     "fullSyncPeriod" : 604800,
     "changedSyncPeriod" : 60,
-    "lastSync" : 1474118374
+    "lastSync" : 1474200692
   } ],
   "userFederationMappers" : [ {
-    "id" : "4ad9e0e4-2341-4ffd-b79a-3358db3ad7f1",
+    "id" : "4f3dc4c9-5009-4ced-a1b9-cebcfbe1eb05",
+    "name" : "username-cn",
+    "federationProviderDisplayName" : "Active Directory",
+    "federationMapperType" : "user-attribute-ldap-mapper",
+    "config" : {
+      "always.read.value.from.ldap" : "false",
+      "read.only" : "false",
+      "ldap.attribute" : "cn",
+      "is.mandatory.in.ldap" : "true",
+      "user.model.attribute" : "username"
+    }
+  }, {
+    "id" : "8a1b804b-cb0c-424a-a3a5-58ae25443e99",
     "name" : "creation date",
     "federationProviderDisplayName" : "Active Directory",
     "federationMapperType" : "user-attribute-ldap-mapper",
@@ -964,19 +976,25 @@
       "user.model.attribute" : "createTimestamp"
     }
   }, {
-    "id" : "1352689b-65ad-4d09-9439-cdf8a8283cbc",
-    "name" : "sAMAccountName",
+    "id" : "408e6275-b45d-49ae-850a-c09362c23b33",
+    "name" : "modify date",
     "federationProviderDisplayName" : "Active Directory",
     "federationMapperType" : "user-attribute-ldap-mapper",
     "config" : {
-      "always.read.value.from.ldap" : "false",
+      "always.read.value.from.ldap" : "true",
       "read.only" : "true",
-      "ldap.attribute" : "sAMAccountName",
-      "is.mandatory.in.ldap" : "true",
-      "user.model.attribute" : "sAMAccountName"
+      "ldap.attribute" : "whenChanged",
+      "is.mandatory.in.ldap" : "false",
+      "user.model.attribute" : "modifyTimestamp"
     }
   }, {
-    "id" : "33452f82-473d-406d-aac3-d26baebc8eca",
+    "id" : "fda5def7-258e-4a64-adce-dfe2063d6fd6",
+    "name" : "MSAD account controls",
+    "federationProviderDisplayName" : "Active Directory",
+    "federationMapperType" : "msad-user-account-control-mapper",
+    "config" : { }
+  }, {
+    "id" : "3a55a8d9-91a3-47d6-981a-3e25fcddb7b5",
     "name" : "last name",
     "federationProviderDisplayName" : "Active Directory",
     "federationMapperType" : "user-attribute-ldap-mapper",
@@ -988,7 +1006,7 @@
       "user.model.attribute" : "lastName"
     }
   }, {
-    "id" : "f48633dd-34a6-400e-a495-c495ad4429cb",
+    "id" : "bbe076f4-0ca3-452c-b72f-f78314966b6f",
     "name" : "first name",
     "federationProviderDisplayName" : "Active Directory",
     "federationMapperType" : "user-attribute-ldap-mapper",
@@ -1000,13 +1018,19 @@
       "user.model.attribute" : "firstName"
     }
   }, {
-    "id" : "e48b575c-2daf-45c2-b258-501f215a4f64",
-    "name" : "MSAD account controls",
+    "id" : "f48bfcf4-9f92-4890-8d91-23ac8cb96690",
+    "name" : "username",
     "federationProviderDisplayName" : "Active Directory",
-    "federationMapperType" : "msad-user-account-control-mapper",
-    "config" : { }
+    "federationMapperType" : "user-attribute-ldap-mapper",
+    "config" : {
+      "always.read.value.from.ldap" : "false",
+      "read.only" : "false",
+      "ldap.attribute" : "sAMAccountName",
+      "is.mandatory.in.ldap" : "true",
+      "user.model.attribute" : "username"
+    }
   }, {
-    "id" : "415ca103-f123-48bd-879a-022b5798d2c4",
+    "id" : "dd867763-3d7e-43fb-bb39-53aa5f58bab0",
     "name" : "email",
     "federationProviderDisplayName" : "Active Directory",
     "federationMapperType" : "user-attribute-ldap-mapper",
@@ -1018,55 +1042,31 @@
       "user.model.attribute" : "email"
     }
   }, {
-    "id" : "b0d27eec-39ee-47e9-aae3-84df7a9989ba",
-    "name" : "username",
-    "federationProviderDisplayName" : "Active Directory",
-    "federationMapperType" : "user-attribute-ldap-mapper",
-    "config" : {
-      "always.read.value.from.ldap" : "false",
-      "read.only" : "false",
-      "ldap.attribute" : "cn",
-      "is.mandatory.in.ldap" : "true",
-      "user.model.attribute" : "username"
-    }
-  }, {
-    "id" : "6e35933c-737d-428a-8e22-6ee219c720be",
-    "name" : "group",
+    "id" : "4713f3c1-4a14-47ba-9370-c3772d25e850",
+    "name" : "Groups",
     "federationProviderDisplayName" : "Active Directory",
     "federationMapperType" : "group-ldap-mapper",
     "config" : {
       "mode" : "LDAP_ONLY",
       "membership.attribute.type" : "DN",
-      "user.roles.retrieve.strategy" : "GET_GROUPS_FROM_USER_MEMBEROF_ATTRIBUTE",
+      "user.roles.retrieve.strategy" : "LOAD_GROUPS_BY_MEMBER_ATTRIBUTE",
       "group.name.ldap.attribute" : "cn",
       "membership.ldap.attribute" : "member",
       "preserve.group.inheritance" : "true",
       "group.object.classes" : "group",
       "groups.dn" : "OU=Groups,OU=World,DC=example,DC=com",
       "drop.non.existing.groups.during.sync" : "false",
-      "mapped.group.attributes" : "sAMAccountName"
-    }
-  }, {
-    "id" : "12979101-7421-4bfb-a373-9bfa96afdce8",
-    "name" : "modify date",
-    "federationProviderDisplayName" : "Active Directory",
-    "federationMapperType" : "user-attribute-ldap-mapper",
-    "config" : {
-      "always.read.value.from.ldap" : "true",
-      "read.only" : "true",
-      "ldap.attribute" : "whenChanged",
-      "is.mandatory.in.ldap" : "false",
-      "user.model.attribute" : "modifyTimestamp"
+      "mapped.group.attributes" : ""
     }
   } ],
-  "eventsEnabled" : false,
+  "eventsEnabled" : true,
   "eventsListeners" : [ "jboss-logging" ],
-  "enabledEventTypes" : [ ],
-  "adminEventsEnabled" : false,
+  "enabledEventTypes" : [ "SEND_RESET_PASSWORD", "UPDATE_TOTP", "REMOVE_TOTP", "REVOKE_GRANT", "LOGIN_ERROR", "CLIENT_LOGIN", "RESET_PASSWORD_ERROR", "CODE_TO_TOKEN_ERROR", "CUSTOM_REQUIRED_ACTION", "UPDATE_PROFILE_ERROR", "IMPERSONATE", "LOGIN", "UPDATE_PASSWORD_ERROR", "REGISTER", "LOGOUT", "CLIENT_REGISTER", "UPDATE_PASSWORD", "FEDERATED_IDENTITY_LINK_ERROR", "CLIENT_DELETE", "IDENTITY_PROVIDER_FIRST_LOGIN", "VERIFY_EMAIL", "CLIENT_DELETE_ERROR", "CLIENT_LOGIN_ERROR", "REMOVE_FEDERATED_IDENTITY_ERROR", "EXECUTE_ACTIONS", "SEND_IDENTITY_PROVIDER_LINK_ERROR", "SEND_VERIFY_EMAIL", "EXECUTE_ACTIONS_ERROR", "REMOVE_FEDERATED_IDENTITY", "IDENTITY_PROVIDER_POST_LOGIN", "UPDATE_EMAIL", "REGISTER_ERROR", "LOGOUT_ERROR", "UPDATE_EMAIL_ERROR", "CLIENT_UPDATE_ERROR", "UPDATE_PROFILE", "FEDERATED_IDENTITY_LINK", "CLIENT_REGISTER_ERROR", "SEND_VERIFY_EMAIL_ERROR", "SEND_IDENTITY_PROVIDER_LINK", "RESET_PASSWORD", "REMOVE_TOTP_ERROR", "VERIFY_EMAIL_ERROR", "SEND_RESET_PASSWORD_ERROR", "CLIENT_UPDATE", "IDENTITY_PROVIDER_POST_LOGIN_ERROR", "CUSTOM_REQUIRED_ACTION_ERROR", "UPDATE_TOTP_ERROR", "CODE_TO_TOKEN", "IDENTITY_PROVIDER_FIRST_LOGIN_ERROR" ],
+  "adminEventsEnabled" : true,
   "adminEventsDetailsEnabled" : false,
   "identityProviders" : [ {
     "alias" : "google",
-    "internalId" : "9b65e419-7dcd-482f-b73a-606217491bdc",
+    "internalId" : "e3182ad2-a78b-4a08-9307-70186f2f39c3",
     "providerId" : "google",
     "enabled" : true,
     "updateProfileFirstLoginMode" : "on",
@@ -1074,17 +1074,27 @@
     "storeToken" : false,
     "addReadTokenRoleOnCreate" : false,
     "authenticateByDefault" : false,
-    "firstBrokerLoginFlowAlias" : "first broker login",
+    "firstBrokerLoginFlowAlias" : "custom-first broker login",
     "config" : {
       "clientSecret" : "K2wPQAwcR6RmqOolt8mG0_Ra",
       "clientId" : "117755102837-o709ohiujco46sbsr8nbl67pthq42i96.apps.googleusercontent.com"
+    }
+  } ],
+  "identityProviderMappers" : [ {
+    "id" : "ad581889-2fc5-4095-8ee7-029f06c5677a",
+    "name" : "Google Apps Domain",
+    "identityProviderAlias" : "google",
+    "identityProviderMapper" : "google-user-attribute-mapper",
+    "config" : {
+      "userAttribute" : "googleAppsDomain",
+      "jsonField" : "hd"
     }
   } ],
   "components" : { },
   "internationalizationEnabled" : false,
   "supportedLocales" : [ ],
   "authenticationFlows" : [ {
-    "id" : "6acbd3bf-7e8c-49b1-ab6d-ba4cd832a0b9",
+    "id" : "635873b5-7ca4-49b1-a2fc-6bedcadf8b6d",
     "alias" : "Handle Existing Account",
     "description" : "Handle what to do if there is existing account with same email/username like authenticated identity provider",
     "providerId" : "basic-flow",
@@ -1110,7 +1120,7 @@
       "autheticatorFlow" : true
     } ]
   }, {
-    "id" : "50debfe6-1dd7-4e5b-aea5-fc1fe2faab9e",
+    "id" : "dd493f8a-61c4-4954-9cbf-865a8226ef83",
     "alias" : "Verify Existing Account by Re-authentication",
     "description" : "Reauthentication of existing account",
     "providerId" : "basic-flow",
@@ -1130,7 +1140,7 @@
       "autheticatorFlow" : false
     } ]
   }, {
-    "id" : "98643106-2509-426d-9042-09e13da1ec9b",
+    "id" : "bc126331-1403-40b7-ab33-75a5cf6ee54e",
     "alias" : "browser",
     "description" : "browser based authentication",
     "providerId" : "basic-flow",
@@ -1162,7 +1172,7 @@
       "autheticatorFlow" : true
     } ]
   }, {
-    "id" : "c377aac0-48e5-4a7e-9044-51288b92e306",
+    "id" : "0b734621-3d6d-4eb5-a208-b04cbe8a6f0a",
     "alias" : "clients",
     "description" : "Base authentication for clients",
     "providerId" : "client-flow",
@@ -1182,7 +1192,88 @@
       "autheticatorFlow" : false
     } ]
   }, {
-    "id" : "f9e97da7-3d08-40e8-9f69-e5bc6981ff8d",
+    "id" : "fc814923-0f4a-4d56-b0b4-532e5c485f08",
+    "alias" : "custom-first broker login",
+    "description" : "Actions taken after first broker login with identity provider account, which is not yet linked to any Keycloak account",
+    "providerId" : "basic-flow",
+    "topLevel" : true,
+    "builtIn" : false,
+    "authenticationExecutions" : [ {
+      "authenticatorConfig" : "Strip email domain from username",
+      "authenticator" : "auth-script-based",
+      "requirement" : "REQUIRED",
+      "priority" : 10,
+      "userSetupAllowed" : false,
+      "autheticatorFlow" : false
+    }, {
+      "authenticatorConfig" : "review profile config",
+      "authenticator" : "idp-review-profile",
+      "requirement" : "REQUIRED",
+      "priority" : 20,
+      "userSetupAllowed" : false,
+      "autheticatorFlow" : false
+    }, {
+      "authenticatorConfig" : "create unique user config",
+      "authenticator" : "idp-create-user-if-unique",
+      "requirement" : "ALTERNATIVE",
+      "priority" : 30,
+      "userSetupAllowed" : false,
+      "autheticatorFlow" : false
+    }, {
+      "requirement" : "ALTERNATIVE",
+      "priority" : 31,
+      "flowAlias" : "custom-first broker login Handle Existing Account",
+      "userSetupAllowed" : false,
+      "autheticatorFlow" : true
+    } ]
+  }, {
+    "id" : "38ef72f0-777e-47d9-935c-5575d812f30f",
+    "alias" : "custom-first broker login Handle Existing Account",
+    "description" : "Handle what to do if there is existing account with same email/username like authenticated identity provider",
+    "providerId" : "basic-flow",
+    "topLevel" : false,
+    "builtIn" : false,
+    "authenticationExecutions" : [ {
+      "authenticator" : "idp-confirm-link",
+      "requirement" : "REQUIRED",
+      "priority" : 10,
+      "userSetupAllowed" : false,
+      "autheticatorFlow" : false
+    }, {
+      "authenticator" : "idp-email-verification",
+      "requirement" : "ALTERNATIVE",
+      "priority" : 20,
+      "userSetupAllowed" : false,
+      "autheticatorFlow" : false
+    }, {
+      "requirement" : "ALTERNATIVE",
+      "priority" : 30,
+      "flowAlias" : "custom-first broker login Verify Existing Account by Re-authentication",
+      "userSetupAllowed" : false,
+      "autheticatorFlow" : true
+    } ]
+  }, {
+    "id" : "3c762fd7-f083-405c-8ba5-027f6025b153",
+    "alias" : "custom-first broker login Verify Existing Account by Re-authentication",
+    "description" : "Reauthentication of existing account",
+    "providerId" : "basic-flow",
+    "topLevel" : false,
+    "builtIn" : false,
+    "authenticationExecutions" : [ {
+      "authenticator" : "idp-username-password-form",
+      "requirement" : "REQUIRED",
+      "priority" : 10,
+      "userSetupAllowed" : false,
+      "autheticatorFlow" : false
+    }, {
+      "authenticator" : "auth-otp-form",
+      "requirement" : "OPTIONAL",
+      "priority" : 20,
+      "userSetupAllowed" : false,
+      "autheticatorFlow" : false
+    } ]
+  }, {
+    "id" : "92f704f0-0c16-4e9a-bc13-74ccca347231",
     "alias" : "direct grant",
     "description" : "OpenID Connect Resource Owner Grant",
     "providerId" : "basic-flow",
@@ -1208,7 +1299,7 @@
       "autheticatorFlow" : false
     } ]
   }, {
-    "id" : "67f6665a-2945-4401-aca9-2e0d6eed23bf",
+    "id" : "76ddb571-f76a-4204-8c75-1a1ba2c4b098",
     "alias" : "first broker login",
     "description" : "Actions taken after first broker login with identity provider account, which is not yet linked to any Keycloak account",
     "providerId" : "basic-flow",
@@ -1236,7 +1327,7 @@
       "autheticatorFlow" : true
     } ]
   }, {
-    "id" : "3c2e07b4-b1a2-4546-9930-6be1a7fabe39",
+    "id" : "b68bdaae-7868-4ecc-856d-04813c48cd9f",
     "alias" : "forms",
     "description" : "Username, password, otp and other auth forms.",
     "providerId" : "basic-flow",
@@ -1256,7 +1347,7 @@
       "autheticatorFlow" : false
     } ]
   }, {
-    "id" : "29ed893a-f92c-458a-b227-0b346c72da69",
+    "id" : "d993dcac-ebd4-4e78-aa63-4e0f09bf9d6f",
     "alias" : "registration",
     "description" : "registration flow",
     "providerId" : "basic-flow",
@@ -1271,7 +1362,7 @@
       "autheticatorFlow" : true
     } ]
   }, {
-    "id" : "f63ac01d-4bb8-43ed-9c8a-f5a59d0b0c7e",
+    "id" : "9be10448-810c-40bb-a52d-44bd0ee0ecb6",
     "alias" : "registration form",
     "description" : "registration form",
     "providerId" : "form-flow",
@@ -1303,7 +1394,7 @@
       "autheticatorFlow" : false
     } ]
   }, {
-    "id" : "3ae932bc-a6cf-462f-a242-6be836779153",
+    "id" : "4cd23b59-92bf-4427-bb6d-1f9769e0abf3",
     "alias" : "reset credentials",
     "description" : "Reset credentials for a user if they forgot their password or something",
     "providerId" : "basic-flow",
@@ -1335,7 +1426,7 @@
       "autheticatorFlow" : false
     } ]
   }, {
-    "id" : "f1ce18a6-a455-4618-af06-a6c01c7b7a37",
+    "id" : "4cef89e5-b0e8-4458-91fb-fd770aa3659c",
     "alias" : "saml ecp",
     "description" : "SAML ECP Profile Authentication Flow",
     "providerId" : "basic-flow",
@@ -1350,16 +1441,24 @@
     } ]
   } ],
   "authenticatorConfig" : [ {
-    "id" : "8a731d5d-0d42-46be-afa4-478701af4dcc",
+    "id" : "e54ca50f-7056-4ae6-9f55-3bfbef544d5a",
+    "alias" : "Strip email domain from username",
+    "config" : {
+      "scriptName" : "StripEmailDomainFromUsername",
+      "scriptCode" : "/**\n * Strip email domain from username. sAMAccountName should not contain @.\n */\n\nvar SerializedBrokeredIdentityContext = org.keycloak.authentication.authenticators.broker.util.SerializedBrokeredIdentityContext;\nvar AbstractIdpAuthenticator = org.keycloak.authentication.authenticators.broker.AbstractIdpAuthenticator;\n\nfunction authenticate(context)\n{\n    //LOG.info('StripEmailDomainFromUsername.authenticate()');\n    \n    var clientSession = context.getClientSession();\n    var ctx = SerializedBrokeredIdentityContext.readFromClientSession(clientSession, AbstractIdpAuthenticator.BROKERED_CONTEXT_NOTE);\n    \n    var username = ctx.getUsername(); \n    var domainPos = username.indexOf('@');\n    if (domainPos > 0) {\n        ctx.setUsername(username.substring(0, domainPos));\n    }\n    \n    ctx.saveToClientSession(clientSession, AbstractIdpAuthenticator.BROKERED_CONTEXT_NOTE);\n    \n    context.success();\n}",
+      "scriptDescription" : "Strip email domain from username. sAMAccountName should not contain @."
+    }
+  }, {
+    "id" : "12a502d5-730f-40c6-b898-096cff118df0",
     "alias" : "create unique user config",
     "config" : {
       "require.password.update.after.registration" : "false"
     }
   }, {
-    "id" : "3ddf418c-1e24-4269-8cd8-99e79f2dbb36",
+    "id" : "b606bb3c-de19-4f50-8d56-03a0657c6f17",
     "alias" : "review profile config",
     "config" : {
-      "update.profile.on.first.login" : "missing"
+      "update.profile.on.first.login" : "on"
     }
   } ],
   "requiredActions" : [ {
