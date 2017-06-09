@@ -33,7 +33,7 @@ gen_cert() {
 		cat /etc/pki/tls/openssl.cnf &&
 		echo "[v3_server]
 		basicConstraints = critical,CA:FALSE
-		keyUsage = digitalSignature, keyAgreement
+		keyUsage = digitalSignature
 		extendedKeyUsage = serverAuth
 		subjectAltName=DNS:$domain,DNS:*.$domain"
 	)
