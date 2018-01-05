@@ -17,7 +17,7 @@ fi
 
 # http://serverfault.com/a/425237
 now=$(date +%s)
-apt_cache_update_ts=$(stat -c '%Y' /var/lib/apt/periodic/update-success-stamp)
+apt_cache_update_ts=$(stat -c '%Y' /var/lib/apt/periodic/update-success-stamp 2>/dev/null || echo 0)
 if (( $now - $apt_cache_update_ts > 86400 )) ; then
 	apt-get update
 fi
