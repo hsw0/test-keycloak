@@ -20,7 +20,7 @@ Vagrant.configure(2) do |config|
 
   # Keycloak
   config.vm.define "keycloak", autostart: true do |node|
-    node.vm.box = "bento/centos-7.2"
+    node.vm.box = "bento/centos-7.4"
     node.vm.hostname = "keycloak" + HOSTNAME_SUFFIX
     node.vm.network "private_network", ip: "192.168.33.225"
     node.vm.provider :virtualbox do |vb|

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-KEYCLOAK_VERSION=2.2.0.Final
+KEYCLOAK_VERSION=3.4.3.Final
 KEYCLOAK_ARCHIVE_NAME="keycloak-$KEYCLOAK_VERSION.tar.gz"
 KEYCLOAK_ARCHIVE_PATH="/vagrant/shared/$KEYCLOAK_ARCHIVE_NAME"
 
@@ -23,7 +23,7 @@ if [ ! -e /srv/keycloak ]; then
 	ln -snf /srv/keycloak-* /srv/keycloak
 fi
 
-perl -pe 's|<http-listener name="default" socket-binding="http" redirect-socket="https"/>|<http-listener name="default" socket-binding="http" redirect-socket="https" proxy-address-forwarding="true" />|' -i /srv/keycloak/standalone/configuration/standalone.xml
+perl -pe 's|<http-listener name="default" socket-binding="http" redirect-socket="https" enable-http2="true"/>|<http-listener name="default" socket-binding="http" redirect-socket="https" proxy-address-forwarding="true" />|' -i /srv/keycloak/standalone/configuration/standalone.xml
 perl -pe 's|<host name="default-host" alias="localhost">|<host name="default-host" alias="localhost" default-web-module="keycloak-server.war">|' -i /srv/keycloak/standalone/configuration/standalone.xml
 perl -pe 's|<location name="/" handler="welcome-content"/>||' -i /srv/keycloak/standalone/configuration/standalone.xml
 
