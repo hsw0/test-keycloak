@@ -12,11 +12,41 @@
     - dnsmasq
 
 - hosts: idsvc
+  tasks:
+    - name: Create keycloak truststore directory
+      file:
+        path: "{{ item }}"
+        owner: root
+        group: root
+        mode: 0755
+        state: directory
+      with_items:
+        - /srv/keycloak
+        - /srv/keycloak/truststore
+
+    - name: Download Google CA Certificate
+      get_url:
+        url: https://pki.google.com/GIAG2.crt
+        dest: /srv/keycloak/truststore/GIAg2.crt
+        checksum: sha256:9b759d41e3de30f9d2f902027d792b65d950a98bbb6d6d56be7f2528453bf8e9
+
+    - name: Download Samba DC Self signed certificate
+      shell: openssl s_client -connect dc1.example.com:636 -showcerts < /dev/null 2> /dev/null | openssl x509 > /srv/keycloak/truststore/samba.pem
+      args:
+        creates: /srv/keycloak/truststore/samba.pem
+
+- hosts: idsvc
   vars:
     nginx_proxy_selfsign_certs:
       example: example.com
+    keycloak_version: 3.4.3.Final
+    docker_daemon_config:
+      # https://github.com/moby/moby/issues/23910
+      dns: [ "172.17.0.1" ]
   roles:
     - nginx_proxy
+    - docker_host
+    - keycloak
 
 - hosts: examples
   vars:

@@ -26,7 +26,6 @@ Vagrant.configure(2) do |config|
     node.vm.provider :virtualbox do |vb|
       vb.memory = 512
     end
-    node.vm.provision "shell", path: "provision/keycloak/provision.sh"
     node.vm.provision :ansible, run: "always" do |ansible|
       ansible.playbook = "provision/playbook.yml"
       ansible.become = true

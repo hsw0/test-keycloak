@@ -1,0 +1,126 @@
+---
+
+- name: Create docker image base directory
+  file:
+    path: /srv/keycloak/docker
+    owner: root
+    group: root
+    mode: 0700
+    state: directory
+
+- name: Create docker image directories
+  file:
+    path: "/srv/keycloak/docker/{{ item['path'] }}"
+    owner: root
+    group: root
+    mode: "{{ item['mode'] }}"
+    state: directory
+  with_filetree: docker/
+  when: item['state'] == 'directory'
+
+- name: Copy docker image templates
+  template:
+    src: "{{ item['src'] }}"
+    dest: "/srv/keycloak/docker/{{ item['path'] }}"
+    owner: root
+    group: root
+    mode: "{{ item['mode'] }}"
+  with_filetree: docker/
+  when: item['state'] == 'file'
+
+
+- name: Pull keycloak base image
+  docker_image:
+    name: jboss/keycloak:3.4.3.Final
+    pull: yes
+
+- name: Build custom keycloak image
+  docker_image:
+    path: /srv/keycloak/docker
+    name: keycloak
+    tag: latest
+    buildargs:
+      KEYCLOAK_VERSION: "{{ keycloak_version }}"
+    state: present
+    force: yes
+
+
+- name: Ensure keycloak volume base directory exists
+  file:
+    path: /srv/keycloak
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+
+- name: Ensure keycloak data directory exists
+  file:
+    path: /srv/keycloak/data
+    state: directory
+    owner: root
+    group: root
+    mode: 01777  # FIXME: 최소 퍼미션
+
+- name: Ensure keycloak log directory exists
+  file:
+    path: /srv/keycloak/log
+    state: directory
+    owner: root
+    group: root
+    mode: 01777  # FIXME
+
+- name: Provision
+  script: provision.sh
+  args:
+    creates: /srv/keycloak/data/keycloak.mv.db
+
+- name: Install systemd service
+  template:
+    src: keycloak.service.j2
+    dest: /etc/systemd/system/keycloak.service
+    owner: root
+    group: root
+    mode: 0644
+  register: systemd_unit_install
+
+- name: Reload systemd
+  systemd:
+    daemon_reload: yes
+  when: systemd_unit_install|changed
+
+- name: Start keycloak service
+  service:
+    name: keycloak
+    state: restarted
+  register: start_keycloak
+
+- name: Wait for Keycloak to start up
+  uri:
+    url: "http://127.0.0.1:8080/auth/realms/master"
+    status_code: 200
+    timeout: 5
+  register: service_status
+  # Keep trying for 5 mins in 5 sec intervals
+  retries: 60
+  delay: 5
+  until: >
+     'status' in service_status and
+     service_status['status'] == 200
+  when: start_keycloak|changed
+
+- name: Enable keycloak service
+  service:
+    name: keycloak
+    enabled: yes
+
+- name: Install nginx vhost conf
+  template:
+    src: nginx/conf.d/keycloak.conf.j2
+    dest: /etc/nginx/conf.d/keycloak.conf
+    owner: root
+    group: root
+    mode: 0644
+  notify: Reload nginx
+
+- meta: flush_handlers
+
