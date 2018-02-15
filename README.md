@@ -144,9 +144,11 @@
 
 ## 로컬 설정
 
-Vagrant 설치:
+
+Vagrant & Ansible 설치:
 
 ```
+brew install ansible
 brew cask install vagrant
 ```
 

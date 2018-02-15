@@ -27,6 +27,11 @@ Vagrant.configure(2) do |config|
       vb.memory = 512
     end
     node.vm.provision "shell", path: "provision/keycloak/provision.sh"
+    node.vm.provision :ansible, run: "always" do |ansible|
+      ansible.playbook = "provision/playbook.yml"
+      ansible.become = true
+      ansible.compatibility_mode = "2.0"
+    end
   end
 
   # Keycloak 연동 예제
@@ -38,6 +43,11 @@ Vagrant.configure(2) do |config|
       vb.memory = 512
     end
     node.vm.provision "shell", path: "provision/examples/provision.sh"
+    node.vm.provision :ansible, run: "always" do |ansible|
+      ansible.playbook = "provision/playbook.yml"
+      ansible.become = true
+      ansible.compatibility_mode = "2.0"
+    end
   end
 
   # prevent compromised vm overwriting vagrant files...
