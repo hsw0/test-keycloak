@@ -1,0 +1,48 @@
+---
+
+- name: Add docker yum repository
+  yum_repository:
+    name: docker-ce-stable
+    description: Docker CE Stable - $basearch
+    baseurl: "https://download.docker.com/linux/centos/7/$basearch/stable"
+    gpgcheck: yes
+    gpgkey: "https://download.docker.com/linux/centos/gpg"
+
+- name: Install docker
+  package:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - docker-ce
+    - python-docker-py
+
+- name: Add vagrant user to docker group
+  user:
+    name: vagrant
+    groups: docker
+
+
+- name: Ensure docker daemon config directory exists
+  file:
+    path: /etc/docker
+    state: directory
+    owner: root
+    group: root
+    mode: 0700
+
+- name: Write docker daemon config
+  copy:
+    dest: /etc/docker/daemon.json
+    content: "{{ docker_daemon_config|to_nice_json }}"
+    owner: root
+    group: root
+    mode: 0400
+  notify: Restart docker
+
+- meta: flush_handlers
+
+- name: Ensure docker service is active
+  service:
+    name: docker
+    state: started
+    enabled: yes
