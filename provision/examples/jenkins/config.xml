@@ -65,8 +65,14 @@
     </roleMap>
     <roleMap type="slaveRoles"/>
   </authorizationStrategy>
-  <securityRealm class="org.jenkinsci.plugins.saml.SamlSecurityRealm" plugin="saml@0.6">
-    <idpMetadata>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+  <securityRealm class="org.jenkinsci.plugins.saml.SamlSecurityRealm" plugin="saml@1.0.5">
+    <displayNameAttributeName>http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name</displayNameAttributeName>
+    <groupsAttributeName>http://schemas.xmlsoap.org/claims/Group</groupsAttributeName>
+    <maximumAuthenticationLifetime>86400</maximumAuthenticationLifetime>
+    <usernameCaseConversion>none</usernameCaseConversion>
+    <binding>urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect</binding>
+    <idpMetadataConfiguration>
+      <xml>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
 &lt;EntityDescriptor entityID=&quot;https://keycloak.example.com/auth/realms/example&quot;
                    xmlns=&quot;urn:oasis:names:tc:SAML:2.0:metadata&quot;
                    xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;&gt;
@@ -97,11 +103,10 @@
           &lt;/dsig:KeyInfo&gt;
       &lt;/KeyDescriptor&gt;
    &lt;/IDPSSODescriptor&gt;
-&lt;/EntityDescriptor&gt;</idpMetadata>
-    <displayNameAttributeName>http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name</displayNameAttributeName>
-    <groupsAttributeName>http://schemas.xmlsoap.org/claims/Group</groupsAttributeName>
-    <maximumAuthenticationLifetime>86400</maximumAuthenticationLifetime>
-    <usernameCaseConversion>none</usernameCaseConversion>
+&lt;/EntityDescriptor&gt;</xml>
+      <url></url>
+      <period>0</period>
+    </idpMetadataConfiguration>
   </securityRealm>
   <disableRememberMe>false</disableRememberMe>
   <projectNamingStrategy class="jenkins.model.ProjectNamingStrategy$DefaultProjectNamingStrategy"/>

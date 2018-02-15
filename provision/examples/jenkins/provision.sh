@@ -28,7 +28,7 @@ install -d -o jenkins -g jenkins -m 755 "$JENKINS_HOME/plugins"
 retries=5
 for i in $(seq $retries) ; do
 	rm -rf $JENKINS_HOME/plugins/*.lock
-	install_plugin $SUGGESTED_PLUGINS saml:0.6 role-strategy:2.3.2 &&
+	install_plugin $SUGGESTED_PLUGINS saml:1.0.5 role-strategy:2.7.0 &&
 		break
 
 	if (( $i <= $retries )); then
