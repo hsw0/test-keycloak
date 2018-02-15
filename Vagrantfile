@@ -20,7 +20,7 @@ Vagrant.configure(2) do |config|
 
   # Keycloak
   config.vm.define "idsvc", autostart: true do |node|
-    node.vm.box = "bento/centos-7.4"
+    node.vm.box = "centos/7"
     node.vm.hostname = "idsvc" + HOSTNAME_SUFFIX
     node.vm.network "private_network", ip: "192.168.33.225"
     node.vm.provider :virtualbox do |vb|
@@ -35,7 +35,7 @@ Vagrant.configure(2) do |config|
 
   # Keycloak 연동 예제
   config.vm.define "examples", autostart: true do |node|
-    node.vm.box = "bento/centos-7.2"
+    node.vm.box = "centos/7"
     node.vm.hostname = "examples" + HOSTNAME_SUFFIX
     node.vm.network "private_network", ip: "192.168.33.226"
     node.vm.provider :virtualbox do |vb|
