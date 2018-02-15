@@ -54,4 +54,37 @@
       example: example.com
   roles:
     - nginx_proxy
+    - jenkins
+  tasks:
+    - name: Install packages
+      package:
+        name: "{{ item }}"
+        state: present
+      with_items:
+        - unzip
+        - zip
+
+    - name: Install nginx vhosts config
+      template:
+        src: examples/jenkins/nginx-jenkins.conf.j2
+        dest: /etc/nginx/conf.d/jenkins.conf
+        owner: root
+        group: root
+        mode: 0644
+      notify: Reload nginx
+
+    - name: Provision
+      script: examples/jenkins/provision.sh
+      args:
+        creates: /var/lib/jenkins/config.xml
+
+    - name: Ensure jenkins service is started
+      service:
+        name: jenkins
+        state: started
+
+    - name: Autostart jenkins service
+      service:
+        name: jenkins
+        enabled: yes
 
