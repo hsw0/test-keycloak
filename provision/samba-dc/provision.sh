@@ -121,8 +121,6 @@ if [ "$needs_provision" == "true" ]; then
 
 	echo -ne "$random_admin_passwd\n$ADMIN_PASSWD\n$ADMIN_PASSWD" |
 		kpasswd "Administrator@$DOMAIN"
-
-	cp -f /var/lib/samba/private/tls/ca.pem /vagrant/shared/samba-dc-ldaps-ca.pem
 else
 	echo "Domain controller already provisioned."
 fi
