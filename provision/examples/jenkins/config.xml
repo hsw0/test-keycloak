@@ -67,7 +67,7 @@
   </authorizationStrategy>
   <securityRealm class="org.jenkinsci.plugins.saml.SamlSecurityRealm" plugin="saml@0.6">
     <idpMetadata>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
-&lt;EntityDescriptor entityID=&quot;https://keycloak.example.com/realms/example&quot;
+&lt;EntityDescriptor entityID=&quot;https://keycloak.example.com/auth/realms/example&quot;
                    xmlns=&quot;urn:oasis:names:tc:SAML:2.0:metadata&quot;
                    xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;&gt;
    &lt;IDPSSODescriptor WantAuthnRequestsSigned=&quot;false&quot;
@@ -78,15 +78,15 @@
    &lt;NameIDFormat&gt;urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress&lt;/NameIDFormat&gt;
 
       &lt;SingleSignOnService Binding=&quot;urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST&quot;
-         Location=&quot;https://keycloak.example.com/realms/example/protocol/saml&quot; /&gt;
+         Location=&quot;https://keycloak.example.com/auth/realms/example/protocol/saml&quot; /&gt;
       &lt;SingleSignOnService Binding=&quot;urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect&quot;
-         Location=&quot;https://keycloak.example.com/realms/example/protocol/saml&quot; /&gt;
+         Location=&quot;https://keycloak.example.com/auth/realms/example/protocol/saml&quot; /&gt;
       &lt;SingleLogoutService
          Binding=&quot;urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST&quot;
-         Location=&quot;https://keycloak.example.com/realms/example/protocol/saml&quot; /&gt;
+         Location=&quot;https://keycloak.example.com/auth/realms/example/protocol/saml&quot; /&gt;
       &lt;SingleLogoutService
          Binding=&quot;urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect&quot;
-         Location=&quot;https://keycloak.example.com/realms/example/protocol/saml&quot; /&gt;
+         Location=&quot;https://keycloak.example.com/auth/realms/example/protocol/saml&quot; /&gt;
       &lt;KeyDescriptor use=&quot;signing&quot;&gt;
           &lt;dsig:KeyInfo xmlns:dsig=&quot;http://www.w3.org/2000/09/xmldsig#&quot;&gt;
               &lt;dsig:X509Data&gt;
