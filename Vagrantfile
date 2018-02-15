@@ -52,6 +52,6 @@ Vagrant.configure(2) do |config|
 
   # prevent compromised vm overwriting vagrant files...
   config.vm.synced_folder ".", "/vagrant", type: "rsync",
-    rsync__exclude: [ ".git", "shared" ]
+    rsync__exclude: [ ".git", "shared", ".*.sw[a-z]" ]
   config.vm.synced_folder "shared", "/vagrant/shared"
 end
