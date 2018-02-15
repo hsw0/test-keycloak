@@ -160,20 +160,20 @@ VM 셸 진입
 
 ```
 vagrant ssh VM 명
-# ex) vagrant ssh keycloak
+# ex) vagrant ssh idsvc
 ```
 
 /etc/hosts:
 
 ```
 192.168.33.224	dc1.example.com
-192.168.33.225	keycloak.example.com
+192.168.33.225	idsvc.example.com keycloak.example.com pwm.example.com
 192.168.33.226	ci.example.com
 ```
 
 ## Keycloak 설정
 
-* Vagrant VM: `keycloak`
+* Vagrant VM: `idsvc`
 
 * URL: https://keycloak.example.com
 
