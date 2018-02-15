@@ -1,0 +1,20 @@
+# {{ansible_managed}}
+
+[Unit]
+Description=Keycloak Identity and Access Management service
+After=docker.service
+Requires=docker.service
+
+[Service]
+ExecStartPre=-/usr/bin/docker stop %n
+ExecStartPre=-/usr/bin/docker rm %n
+ExecStart=/usr/bin/docker run --name %n --env PROXY_ADDRESS_FORWARDING=true --volume /srv/keycloak/data:/opt/jboss/keycloak/standalone/data --volume /srv/keycloak/truststore:/opt/jboss/keycloak/standalone/configuration/truststore --publish=127.0.0.1:8080:8080 keycloak:latest
+ExecStop=-/usr/bin/docker stop %n
+ExecStopPost=-/usr/bin/docker rm %n
+TimeoutStartSec=0
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+

@@ -1,0 +1,23 @@
+# {{ansible_managed}}
+
+listen 443 ssl http2 default_server;
+listen [::]:443 ssl http2 default_server;
+
+ssl_certificate /etc/pki/tls/certs/default_server.pem;
+ssl_certificate_key /etc/pki/tls/private/default_server.pem;
+
+
+location = / {
+	default_type text/plain;
+	return 200 '';
+}
+
+location ~ ^/ {
+	default_type text/plain;
+	return 404 '';
+}
+
+location = /robots.txt {
+	default_type text/plain;
+	return 200 'User-agent:*\nDisallow: /';
+}

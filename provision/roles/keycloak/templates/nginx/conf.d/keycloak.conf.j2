@@ -1,0 +1,45 @@
+# {{ansible_managed}}
+
+upstream keycloak {
+	server 127.0.0.1:8080;
+	keepalive 32;
+}
+
+server {
+	listen 80;
+	listen [::]:80;
+	server_name keycloak.example.com;
+
+	location / {
+		return 302 https://$host$request_uri;
+	}
+
+	access_log log/$scheme-$host.access.log combined;
+	error_log log/$scheme-$host.error.log;
+}
+
+server {
+	listen 443 ssl http2;
+	listen [::]:443 ssl http2;
+	server_name keycloak.example.com;
+
+	ssl_certificate /etc/pki/tls/certs/example.pem;
+	ssl_certificate_key /etc/pki/tls/private/example.pem;
+
+	proxy_http_version 1.1;
+	proxy_set_header Host $http_host;
+	proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+	proxy_set_header X-Forwarded-Proto $scheme;
+	proxy_set_header Connection "";
+	proxy_read_timeout 300;
+
+	proxy_buffers 8 32k;
+	proxy_buffer_size 32k;
+
+	location / {
+		proxy_pass http://keycloak/;
+	}
+
+	access_log log/$scheme-$host.access.log combined;
+	error_log log/$scheme-$host.error.log;
+}

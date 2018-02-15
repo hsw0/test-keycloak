@@ -1,0 +1,23 @@
+# https://access.redhat.com/documentation/en-us/red_hat_single_sign-on/7.1/html/server_installation_and_configuration_guide/manage_config
+# https://access.redhat.com/documentation/en-us/red_hat_jboss_enterprise_application_platform/7.0/html-single/management_cli_guide/index
+# https://docs.jboss.org/author/display/AS71/CLI+Recipes
+
+#  <spi name="truststore">
+#      <provider name="file" enabled="true">
+#          <properties>
+#              <property name="file" value="\${jboss.server.config.dir}/truststore.jks"/>
+#              <property name="password" value="changeit"/>
+#              <property name="hostname-verification-policy" value="WILDCARD"/>
+#              <property name="disabled" value="false"/>
+#          </properties>
+#      </provider>
+#  </spi>
+
+/subsystem=keycloak-server/spi=truststore: add(default-provider=file)
+/subsystem=keycloak-server/spi=truststore/provider=file: add(properties={ \
+ file=>"\${jboss.server.config.dir}/truststore.jks", \
+ password=>"changeit", \
+ hostname-verification-policy=>"WILDCARD", \
+ disabled=>"false" \
+}, enabled=true)
+

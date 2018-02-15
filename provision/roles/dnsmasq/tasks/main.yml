@@ -1,0 +1,108 @@
+
+
+- name: Gather current DNS from system
+  block:
+    - name : Initialize variables
+      set_fact:
+        current_dns_servers: []
+        upstream_dns_servers: []
+
+    - name: Gather DNS from ansible_dns
+      set_fact:
+        current_dns_servers: "{{ current_dns_servers + ansible_dns['nameservers'] }}"
+
+    - name: Gather Uplink interface info
+      set_fact:
+        uplink_interface4: "{{ ansible_default_ipv4['interface']|default('') }}"
+        uplink_interface6: "{{ ansible_default_ipv6['interface']|default('') }}"
+
+    - name: Gather IPv4 DNS from Uplink interface
+      shell: "nmcli dev show {{uplink_interface4}} | grep IP4.DNS | awk '{ print $NF }'"
+      register: nmcli_uplink_interface_dns4
+      when: uplink_interface4 != ''
+
+    - name: Gather IPv6 DNS from Uplink interface
+      shell: "nmcli dev show {{uplink_interface6}} | grep IP6.DNS | awk '{ print $NF }'"
+      register: nmcli_uplink_interface_dns6
+      when: uplink_interface6 != ''
+
+    - name: Gather DNS from Uplink interface
+      set_fact:
+        current_dns_servers: "{{ current_dns_servers + nmcli_uplink_interface_dns4['stdout_lines'] }}"
+
+    - name : Clean up DNS list
+      set_fact:
+        current_dns_servers: "{{ current_dns_servers | unique | difference(['127.0.0.1'])}}"
+
+    - name: Add fallback DNS server if no servers found
+      set_fact:
+        current_dns_servers: "{{ dnsmasq_fallback_servers }}"
+      when: current_dns_servers|length == 0
+
+    - set_fact:
+        upstream_dns_servers: "{{ current_dns_servers }}"
+  when: dnsmasq_upstream_servers|length == 0
+
+- name : Use Provided dnsmasq_upstream_servers variable
+  set_fact:
+    upstream_dns_servers: "{{ dnsmasq_upstream_servers }}"
+  when: dnsmasq_upstream_servers|length > 0
+
+- name: List DNS servers
+  debug:
+    msg: "{{ upstream_dns_servers }}"
+
+
+- name: Install dnsmasq
+  package:
+    name: dnsmasq
+    state: present
+
+- name: Configure dnsmasq
+  template:
+    dest: /etc/dnsmasq.d/local.conf
+    src: dnsmasq-local.conf.j2
+    owner: root
+    group: root
+    mode: 0644
+  notify: Restart dnsmasq
+
+- name: Activate dnsmasq service
+  service:
+    name: dnsmasq
+    state: started
+    enabled: yes
+
+- name: Configure resolv.conf to use dnsmasq
+  copy:
+    dest: /etc/resolv.conf
+    content:
+      nameserver 127.0.0.1
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Configure sysconfig/network to use dnsmasq
+  ini_file:
+    path: /etc/sysconfig/network
+    section: ""
+    option: DNS1
+    value: 127.0.0.1
+    no_extra_spaces: yes
+    backup: yes
+
+- name: Find interface file contains PEERDNS=yes
+  find:
+    path: /etc/sysconfig/network-scripts
+    patterns: "ifcfg-*"
+    contains: PEERDNS=[\"']?yes[\"']?
+  register: ifcfg_files
+
+- name: Set PEERDNS=no to ifcfg files
+  ini_file:
+    path: "{{ item['path'] }}"
+    section: ""
+    option: PEERDNS
+    value: "no"
+    no_extra_spaces: yes
+  with_items: "{{ ifcfg_files['files'] }}"

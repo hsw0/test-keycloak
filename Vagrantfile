@@ -20,28 +20,35 @@ Vagrant.configure(2) do |config|
 
   # Keycloak
   config.vm.define "idsvc", autostart: true do |node|
-    node.vm.box = "bento/centos-7.4"
+    node.vm.box = "centos/7"
     node.vm.hostname = "idsvc" + HOSTNAME_SUFFIX
     node.vm.network "private_network", ip: "192.168.33.225"
     node.vm.provider :virtualbox do |vb|
       vb.memory = 512
     end
-    node.vm.provision "shell", path: "provision/keycloak/provision.sh"
+    node.vm.provision :ansible, run: "always" do |ansible|
+      ansible.playbook = "provision/playbook.yml"
+      ansible.become = true
+      ansible.compatibility_mode = "2.0"
+    end
   end
 
   # Keycloak 연동 예제
   config.vm.define "examples", autostart: true do |node|
-    node.vm.box = "bento/centos-7.2"
+    node.vm.box = "centos/7"
     node.vm.hostname = "examples" + HOSTNAME_SUFFIX
     node.vm.network "private_network", ip: "192.168.33.226"
     node.vm.provider :virtualbox do |vb|
       vb.memory = 512
     end
-    node.vm.provision "shell", path: "provision/examples/provision.sh"
+    node.vm.provision :ansible, run: "always" do |ansible|
+      ansible.playbook = "provision/playbook.yml"
+      ansible.become = true
+      ansible.compatibility_mode = "2.0"
+    end
   end
 
   # prevent compromised vm overwriting vagrant files...
   config.vm.synced_folder ".", "/vagrant", type: "rsync",
-    rsync__exclude: [ ".git", "shared" ]
-  config.vm.synced_folder "shared", "/vagrant/shared"
+    rsync__exclude: [ ".git", "shared", ".*.sw[a-z]" ]
 end

@@ -1,0 +1,94 @@
+---
+
+# nginx가 여기 있음..
+- name: Enable EPEL repository
+  package:
+    name: epel-release
+    state: present
+
+- name: Ensure nginx is installed
+  package:
+    name: nginx
+    state: present
+
+- name: Ensure SELinux package is installed
+  package:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - libselinux-python
+    - libsemanage-python
+
+- name: Link nginx log directory
+  file:
+    src: /var/log/nginx
+    path: /usr/share/nginx/log
+    state: link
+
+- name: Apply nginx default_server vhost config
+  template:
+    src: default.d/default_server.conf.j2
+    dest: /etc/nginx/default.d/default_server.conf
+    owner: root
+    group: root
+    mode: 0644
+  notify: Reload nginx
+
+- name: Apply nginx common vhost config
+  template:
+    src: conf.d/001-http.conf.j2
+    dest: /etc/nginx/conf.d/001-http.conf
+    owner: root
+    group: root
+    mode: 0644
+  notify: Reload nginx
+
+- name: Apply nginx common tls config
+  template:
+    src: conf.d/001-default-tls.conf.j2
+    dest: /etc/nginx/conf.d/001-default-tls.conf
+    owner: root
+    group: root
+    mode: 0644
+  notify: Reload nginx
+
+# 2048bit DH param은 생성시간이 오래 걸림.
+# 빠른 생성을 위해 -dsaparam 사용
+# 실 사용이 아닌 데모 목적임.
+# @see http://security.stackexchange.com/a/95184
+- name: Generate DH param
+  command: openssl dhparam -out /etc/pki/tls/dhparam.pem -dsaparam 2048
+  args:
+    creates: /etc/pki/tls/dhparam.pem
+  notify: Reload nginx
+
+# 매칭되는 도메인이 없을때 사용할 인증서 발급
+- name: Generate self-signed certificate for default(catch-all) vhost
+  script: gen_cert.sh default_server localhost
+  args:
+    creates: /etc/pki/tls/certs/default_server.pem
+  notify: Reload nginx
+
+- name: Generate certificates
+  script: gen_cert.sh "{{ item.key }}" "{{ item.value }}"
+  args:
+    creates: "/etc/pki/tls/certs/{{ item.key }}.pem"
+  with_dict: "{{ nginx_proxy_selfsign_certs }}"
+  notify: Reload nginx
+
+- name: Set selinux boolean httpd_can_network_connect=on
+  seboolean:
+    name: httpd_can_network_connect
+    state: yes
+    persistent: yes
+
+- name: Start nginx service
+  service:
+    name: nginx
+    state: started
+
+- name: Autostart nginx service
+  service:
+    name: nginx
+    enabled: yes
+

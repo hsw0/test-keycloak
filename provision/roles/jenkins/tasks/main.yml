@@ -1,0 +1,40 @@
+---
+
+- name: Install OpenJDK 8
+  package:
+    name: java-1.8.0-openjdk-devel
+    state: present
+
+- name: Ensure jenkins service account is exists
+  user:
+    name: jenkins
+    comment: "Jenkins Continuous Integration Server"
+    system: yes
+    home: /var/lib/jenkins
+    shell: /sbin/nologin
+    createhome: no
+    state: present
+
+- name: Ensure jenkins directory is exists
+  file:
+    path: /var/lib/jenkins
+    owner: jenkins
+    group: jenkins
+    mode: 0750
+    state: directory
+
+
+- name: Add jenkins yum repository
+  yum_repository:
+    name: jenkins-stable
+    description: jenkins-stable
+    baseurl: http://pkg.jenkins.io/redhat-stable
+    gpgkey: https://pkg.jenkins.io/redhat-stable/jenkins.io.key
+    gpgcheck: yes
+
+- name: Install Jenkins
+  package:
+    name: jenkins
+    state: present
+
+

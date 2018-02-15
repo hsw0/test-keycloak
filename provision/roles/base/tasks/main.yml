@@ -1,0 +1,39 @@
+---
+
+- name: Install system packages
+  package:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - net-tools
+
+# 편의용 패키지
+- name: Install utility packages
+  package:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - vim-enhanced
+    - tmux
+    - bind-utils
+    - man-db
+    - man-pages
+
+- name: Set bash history settings
+  copy:
+   content: |
+     HISTTIMEFORMAT="%F %T  "
+     shopt -s histappend
+   dest: /etc/profile.d/history.sh
+   owner: root
+   group: root
+   mode: 0644
+
+- name: Set EDITOR=vim
+  copy:
+   content: "EDITOR=vim"
+   dest: /etc/profile.d/editor.sh
+   owner: root
+   group: root
+   mode: 0644
+
