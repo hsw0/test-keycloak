@@ -11,4 +11,17 @@
     # dnsmasq를 Split-horizon DNS 용으로 사용
     - dnsmasq
 
+- hosts: idsvc
+  vars:
+    nginx_proxy_selfsign_certs:
+      example: example.com
+  roles:
+    - nginx_proxy
+
+- hosts: examples
+  vars:
+    nginx_proxy_selfsign_certs:
+      example: example.com
+  roles:
+    - nginx_proxy
 

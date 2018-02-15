@@ -1,0 +1,6 @@
+---
+nginx_proxy_selfsign_certs: {}
+
+#nginx_proxy_selfsign_certs:
+#  id: domain.com
+#  -> generates /etc/pki/tls/{certs,private}/id.pem

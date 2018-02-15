@@ -1,20 +1,6 @@
 #!/bin/bash
 
-set -e
-
-. /vagrant/provision/scripts/common.sh
-
-yum_install nginx
-
-cp -f /vagrant/provision/nginx/default.d/* /etc/nginx/default.d/
-cp -f /vagrant/provision/nginx/conf.d/*default*.conf /etc/nginx/conf.d/
-ln -snf /var/log/nginx /usr/share/nginx/log
-
-# 2048bit DH param은 생성시간이 오래 걸림.
-# 빠른 생성을 위해 -dsaparam 사용
-# @see http://security.stackexchange.com/a/95184
-[ ! -f /etc/pki/tls/dhparam.pem ] &&
-	openssl dhparam -out /etc/pki/tls/dhparam.pem -dsaparam 2048
+set -eu
 
 gen_cert() {
 	filename="$1"
@@ -40,5 +26,4 @@ gen_cert() {
 
 }
 
-gen_cert default_server localhost
-gen_cert example example.com
+gen_cert "$1" "$2"
