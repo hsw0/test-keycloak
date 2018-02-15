@@ -6,10 +6,6 @@ set -e
 
 yum_install epel-release
 
-# User friendly
-yum_install tmux vim-enhanced man-db man-pages
-
-
 # Install nginx
 /vagrant/provision/nginx/provision.sh
 
