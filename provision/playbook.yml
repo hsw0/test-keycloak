@@ -1,6 +1,14 @@
 ---
 
 - hosts: all
+  vars:
+    dnsmasq_stub_domains:
+      "example.com": [ "192.168.33.224" ]
   roles:
     - base
+    # Samba DC를 DNS resolver로 직접 지정시 DC가 죽은 경우
+    # 패키지 설치, 외부 IDP 로그인시 외부 DNS 조회 실패를 방지하기 위해
+    # dnsmasq를 Split-horizon DNS 용으로 사용
+    - dnsmasq
+
 

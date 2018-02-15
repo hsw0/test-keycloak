@@ -1,0 +1,12 @@
+# {{ ansible_managed }}
+
+{% for server in upstream_dns_servers %}
+server={{server}}
+{% endfor %}
+
+{% for domain, servers in dnsmasq_stub_domains.items() %}{% for server in servers %}
+server=/{{ domain }}/{{ server }}
+{% endfor %}{% endfor %}
+
+no-resolv
+

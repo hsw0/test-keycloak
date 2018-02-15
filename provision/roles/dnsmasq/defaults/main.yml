@@ -1,0 +1,13 @@
+---
+
+dnsmasq_upstream_servers: []
+# dnsmasq_upstream_servers: [ "8.8.4.4" ]
+
+# 기존 DNS 서버를 찾을 수 없을 때 사용할 서버
+dnsmasq_fallback_servers: [ "8.8.8.8" ]
+
+dnsmasq_stub_domains: {}
+
+#dnsmasq_stub_domains:
+#  "example.com": [ "203.0.113.111" ]
+#  "test.com": [ "203.0.113.112" ]
