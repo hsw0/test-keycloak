@@ -1,0 +1,87 @@
+---
+
+- name: Ensure pwm volume base directory exists
+  file:
+    path: /srv/pwm
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+
+- name: Copy Dockerfile
+  synchronize:
+    src: docker/
+    dest: /srv/pwm/docker/
+    owner: no
+    group: no
+    delete: yes
+    archive: yes
+    rsync_opts:
+      - "--exclude='.*.sw[a-p]'"
+
+- name: Pull pwm base image
+  docker_image:
+    name: tomcat:8.5
+    pull: yes
+
+- name: Build custom pwm image
+  docker_image:
+    path: /srv/pwm/docker
+    name: pwm
+    tag: latest
+    state: present
+    force: yes
+
+- name: Ensure pwm data directory exists
+  file:
+    path: /srv/pwm/data
+    state: directory
+    owner: root
+    group: root
+    mode: 01777  # FIXME: 최소 퍼미션
+
+- name: Install systemd environment file
+  copy:
+    dest: /etc/sysconfig/pwm
+    content: |
+      PWM_PORT={{ pwm_port }}
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Install systemd service
+  template:
+    src: pwm.service.j2
+    dest: /etc/systemd/system/pwm.service
+    owner: root
+    group: root
+    mode: 0644
+  register: systemd_unit_install
+
+- name: Reload systemd
+  systemd:
+    daemon_reload: yes
+  when: systemd_unit_install|changed
+
+- name: Start pwm service
+  service:
+    name: pwm
+    state: restarted
+  register: start_pwm
+
+- name: Enable pwm service
+  service:
+    name: pwm
+    enabled: yes
+
+- name: Install nginx vhost conf
+  template:
+    src: nginx/conf.d/pwm.conf.j2
+    dest: /etc/nginx/conf.d/pwm.conf
+    owner: root
+    group: root
+    mode: 0644
+  notify: Reload nginx
+
+- meta: flush_handlers
+
