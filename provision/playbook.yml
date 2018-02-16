@@ -41,6 +41,7 @@
       example: example.com
     keycloak_version: 3.4.3.Final
     keycloak_port: 8080
+    pwm_port: 8081
     docker_daemon_config:
       # https://github.com/moby/moby/issues/23910
       dns: [ "172.17.0.1" ]
@@ -48,6 +49,8 @@
     - nginx_proxy
     - docker_host
     - keycloak
+    - pwm
+
 
 - hosts: examples
   vars:
