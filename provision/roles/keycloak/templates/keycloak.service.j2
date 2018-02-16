@@ -6,9 +6,17 @@ After=docker.service
 Requires=docker.service
 
 [Service]
+Environment=KEYCLOAK_PORT=8080
+EnvironmentFile=-/etc/sysconfig/keycloak
 ExecStartPre=-/usr/bin/docker stop %n
 ExecStartPre=-/usr/bin/docker rm %n
-ExecStart=/usr/bin/docker run --name %n --env PROXY_ADDRESS_FORWARDING=true --volume /srv/keycloak/data:/opt/jboss/keycloak/standalone/data --volume /srv/keycloak/truststore:/opt/jboss/keycloak/standalone/configuration/truststore --publish=127.0.0.1:8080:8080 keycloak:latest
+ExecStart=/usr/bin/docker run \
+ --name %n \
+ --env PROXY_ADDRESS_FORWARDING=true \
+ --volume /srv/keycloak/data:/opt/jboss/keycloak/standalone/data \
+ --volume /srv/keycloak/truststore:/opt/jboss/keycloak/standalone/configuration/truststore \
+ --publish=127.0.0.1:${KEYCLOAK_PORT}:8080 \
+ keycloak:latest
 ExecStop=-/usr/bin/docker stop %n
 ExecStopPost=-/usr/bin/docker rm %n
 TimeoutStartSec=0

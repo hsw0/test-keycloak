@@ -57,6 +57,16 @@
   args:
     creates: /srv/keycloak/data/keycloak.mv.db
 
+
+- name: Install systemd environment file
+  copy:
+    dest: /etc/sysconfig/keycloak
+    content: |
+      KEYCLOAK_PORT={{ keycloak_port }}
+    owner: root
+    group: root
+    mode: 0644
+
 - name: Install systemd service
   template:
     src: keycloak.service.j2
@@ -79,7 +89,7 @@
 
 - name: Wait for Keycloak to start up
   uri:
-    url: "http://127.0.0.1:8080/auth/realms/master"
+    url: "http://127.0.0.1:{{ keycloak_port }}/auth/realms/master"
     status_code: 200
     timeout: 5
   register: service_status

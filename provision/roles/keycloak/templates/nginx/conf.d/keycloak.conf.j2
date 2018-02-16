@@ -1,7 +1,7 @@
 # {{ansible_managed}}
 
 upstream keycloak {
-	server 127.0.0.1:8080;
+	server 127.0.0.1:{{ keycloak_port }};
 	keepalive 32;
 }
 
