@@ -27,10 +27,7 @@ fi
 # http://askubuntu.com/a/501622
 cat > /usr/sbin/policy-rc.d <<EOF
 #!/bin/sh
-if pgrep -f 'apt-get install' > /dev/null ; then
-	echo "Skipping autostart during apt-get install"
-	exit 101
-fi
+exit 101
 EOF
 chmod a+x /usr/sbin/policy-rc.d
 
