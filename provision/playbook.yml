@@ -51,6 +51,16 @@
     - keycloak
     - pwm
 
+- hosts: idsvc
+  tasks:
+    - name: Install pwm sample configuration
+      copy:
+        src: pwm/sample/PwmConfiguration.xml
+        dest: /srv/pwm/data/PwmConfiguration.xml
+        owner: 999
+        group: 999
+        mode: 0600
+        force: false
 
 - hosts: examples
   vars:
