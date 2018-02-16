@@ -1,32 +1,15 @@
 ---
 
-- name: Create docker image base directory
-  file:
-    path: /srv/keycloak/docker
-    owner: root
-    group: root
-    mode: 0700
-    state: directory
-
-- name: Create docker image directories
-  file:
-    path: "/srv/keycloak/docker/{{ item['path'] }}"
-    owner: root
-    group: root
-    mode: "{{ item['mode'] }}"
-    state: directory
-  with_filetree: docker/
-  when: item['state'] == 'directory'
-
-- name: Copy docker image templates
-  template:
-    src: "{{ item['src'] }}"
-    dest: "/srv/keycloak/docker/{{ item['path'] }}"
-    owner: root
-    group: root
-    mode: "{{ item['mode'] }}"
-  with_filetree: docker/
-  when: item['state'] == 'file'
+- name: Copy Dockerfile
+  synchronize:
+    src: docker/
+    dest: /srv/keycloak/docker/
+    owner: no
+    group: no
+    delete: yes
+    archive: yes
+    rsync_opts:
+      - "--exclude='.*.sw[a-p]'"
 
 
 - name: Pull keycloak base image
