@@ -1,0 +1,26 @@
+# {{ansible_managed}}
+
+[Unit]
+Description=PWM password self service application
+After=docker.service
+Requires=docker.service
+
+[Service]
+Environment=PWM_PORT=8080
+EnvironmentFile=-/etc/sysconfig/pwm
+ExecStartPre=-/usr/bin/docker stop %n
+ExecStartPre=-/usr/bin/docker rm %n
+ExecStart=/usr/bin/docker run \
+ --name %n \
+ --volume /srv/pwm/data:/data \
+ --publish=127.0.0.1:${PWM_PORT}:8080 \
+ pwm:latest
+ExecStop=-/usr/bin/docker stop %n
+ExecStopPost=-/usr/bin/docker rm %n
+TimeoutStartSec=0
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+

@@ -141,6 +141,17 @@
 * Vagrant 1.8.5에서 SSH 키로 VM 접속 문제 [vagrant 이슈 #7610](https://github.com/mitchellh/vagrant/pull/7611)
     - `/opt/vagrant/embedded/gems/gems/vagrant-1.8.5/plugins/guests/linux/cap/public_key.rb` 에 [패치](https://github.com/mitchellh/vagrant/pull/7611/files#diff-13c7ed80ab881de1369e3b06c66745e8R57)
 
+## PWM
+
+LDAP 계정 자가 관리 서비스
+
+* [Homepage](https://github.com/pwm-project/pwm)
+
+* 암호 변경
+* 암호 재설정
+* Helpdesk
+* ...
+
 
 ## 로컬 설정
 
@@ -189,6 +200,14 @@ vagrant ssh VM 명
 ### 주 realm: example
 
 계정 관리 페이지: https://keycloak.example.com/realms/example/account
+
+## PWM 설정
+
+* Vagrant VM: `idsvc`
+
+* URL: https://pwm.example.com
+* Configuration Password: `admin`
+* 그 외 계정은 AD와 동일
 
 ## Samba 4 AD 설정
 

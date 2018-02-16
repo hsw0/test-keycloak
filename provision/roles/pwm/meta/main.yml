@@ -1,0 +1,3 @@
+dependencies:
+  - role: docker_host
+  - role: nginx_proxy

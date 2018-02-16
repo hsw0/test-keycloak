@@ -43,6 +43,11 @@ export KRB5CCNAME=KEYRING:session:provision
 # 레코드가 있을 경우 처음 접속 실패시 fallback하지 않고 바로 중단하는 것으로 보임
 echo -e "\n[global]\n\tinterfaces = lo 192.168.33.224.0/24" > /etc/samba/smb.conf.local
 
+# PWM LDAP Referral issue
+#  pwm에서 Referral을 활성화시 samba에서 ldap:// Scheme를 반환하여 제대로 따라갈 수 없음
+# https://bugzilla.samba.org/show_bug.cgi?id=12478
+echo -e "\tldap server require strong auth = no" >> /etc/samba/smb.conf.local
+
 # samba 데몬 시작 대기. 가끔 KDC/DNS는 시작되었는데 LDAP가 늦게 뜨는 등 타이밍 문제가 있음.
 wait_daemon_start() {
 	local max_retries=50
