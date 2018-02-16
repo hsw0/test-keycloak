@@ -1,4 +1,5 @@
-FROM jboss/keycloak:{{ keycloak_version }}
+ARG KEYCLOAK_VERSION=3.4.3.Final
+FROM jboss/keycloak:${KEYCLOAK_VERSION}
 
 # Customize
 USER root

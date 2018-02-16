@@ -31,7 +31,7 @@
 
 - name: Pull keycloak base image
   docker_image:
-    name: jboss/keycloak:3.4.3.Final
+    name: "jboss/keycloak:{{ keycloak_version }}"
     pull: yes
 
 - name: Build custom keycloak image
