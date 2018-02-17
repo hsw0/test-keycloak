@@ -51,15 +51,13 @@
       - name: "{{ keycloak_db_database }}"
         owner: "{{ keycloak_db_username }}"
       - name: "{{ pwm_db_database }}"
-        owner: "{{ pwm_db_username }}"
+        owner: dba
   roles:
     - nginx_proxy
     - docker_host
     - pgsql
     - keycloak
     - pwm
-
-- hosts: idsvc
   tasks:
     - name: Download Google CA Certificate
       get_url:
@@ -78,6 +76,21 @@
       script: keycloak/provision.sh
       args:
         creates: /srv/keycloak/data/.provision.done
+      become: yes
+
+    - name: Populate pwm db schema
+      template:
+        src: pwm/schema.pgsql.sql
+        dest: /srv/pwm/schema.pgsql.sql
+        owner: root
+        group: root
+        mode: 0600
+      become: yes
+
+    - name: Populate pwm db schema
+      shell: psql --username dba --dbname="{{ pwm_db_database }}" --file=/srv/pwm/schema.pgsql.sql && date > /srv/pwm/data/.populate-schema.done
+      args:
+        creates: /srv/pwm/data/.populate-schema.done
       become: yes
 
     - name: Install pwm sample configuration
