@@ -11,29 +11,6 @@
     # dnsmasq를 Split-horizon DNS 용으로 사용
     - dnsmasq
 
-- hosts: idsvc
-  tasks:
-    - name: Create keycloak truststore directory
-      file:
-        path: "{{ item }}"
-        owner: root
-        group: root
-        mode: 0755
-        state: directory
-      with_items:
-        - /srv/keycloak
-        - /srv/keycloak/truststore
-
-    - name: Download Google CA Certificate
-      get_url:
-        url: https://pki.google.com/GIAG2.crt
-        dest: /srv/keycloak/truststore/GIAg2.crt
-        checksum: sha256:9b759d41e3de30f9d2f902027d792b65d950a98bbb6d6d56be7f2528453bf8e9
-
-    - name: Download Samba DC Self signed certificate
-      shell: openssl s_client -connect dc1.example.com:636 -showcerts < /dev/null 2> /dev/null | openssl x509 > /srv/keycloak/truststore/samba.pem
-      args:
-        creates: /srv/keycloak/truststore/samba.pem
 
 - hosts: idsvc
   vars:
@@ -53,6 +30,25 @@
 
 - hosts: idsvc
   tasks:
+    - name: Download Google CA Certificate
+      get_url:
+        url: https://pki.google.com/GIAG2.crt
+        dest: /srv/keycloak/truststore/GIAg2.crt
+        checksum: sha256:9b759d41e3de30f9d2f902027d792b65d950a98bbb6d6d56be7f2528453bf8e9
+
+    - name: Download Samba DC Self signed certificate
+      shell: openssl s_client -connect dc1.example.com:636 -showcerts < /dev/null 2> /dev/null | openssl x509 > /srv/keycloak/truststore/samba.pem
+      args:
+        creates: /srv/keycloak/truststore/samba.pem
+
+    # Import example realm
+    # Add initial admin user
+    - name: Provision keycloak examples
+      script: keycloak/provision.sh
+      args:
+        creates: /srv/keycloak/data/.provision.done
+      become: yes
+
     - name: Install pwm sample configuration
       copy:
         src: pwm/sample/PwmConfiguration.xml

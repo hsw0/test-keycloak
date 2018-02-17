@@ -5,12 +5,15 @@ cd "$( dirname "${BASH_SOURCE[0]}" )"
 
 set -eu
 
+PROVISION_FILE=/srv/keycloak/data/.provision.done
 
 # Initial provision
-if [ -f /srv/keycloak/data/keycloak.mv.db ]; then
+if [ -f "$PROVISION_FILE" ]; then
 	echo "Already provisioned"
 	exit 0
 fi
+
+systemctl stop keycloak.service
 
 PROVISION_CONTAINER_NAME=keycloak-provision
 
@@ -53,3 +56,7 @@ while ! docker exec "$PROVISION_CONTAINER_NAME" /opt/jboss/keycloak/bin/jboss-cl
 		break
 	fi
 done
+
+date > "$PROVISION_FILE"
+
+systemctl start keycloak.service
