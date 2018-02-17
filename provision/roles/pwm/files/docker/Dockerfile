@@ -35,6 +35,11 @@ RUN set -eux && \
     unzip pwm.war -d /usr/local/tomcat/webapps/ROOT && \
     rm -f pwm.zip pwm.war
 
+ARG JDBC_POSTGRES_VERSION=42.1.4
+
+RUN set -eux && \
+    curl -sL -o "${CATALINA_HOME}/webapps/ROOT/WEB-INF/lib/postgresql-jdbc.jar" "http://central.maven.org/maven2/org/postgresql/postgresql/${JDBC_POSTGRES_VERSION}/postgresql-${JDBC_POSTGRES_VERSION}.jar"
+
 ENV PWM_APPLICATIONPATH=/data
 VOLUME [ "/data" ]
 
