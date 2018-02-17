@@ -2,7 +2,12 @@ FROM tomcat:8.5
 
 # Base image is running tomcat as root
 # make sure run as own account
-RUN useradd --system --home-dir /var/empty --no-create-home -s /sbin/nologin tomcat
+RUN useradd \
+    --system \
+    --home-dir "$CATALINA_HOME" \
+    --shell /bin/false \
+    --uid 999 \
+    tomcat
 
 RUN set -eux && \
     cd "$CATALINA_HOME" && \
