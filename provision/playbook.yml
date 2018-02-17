@@ -37,6 +37,7 @@
       - { type: host, database: "{{ keycloak_db_database }}", user: "{{ keycloak_db_username }}", address: "172.17.0.0/16", auth_method: md5 }
       - { type: host, database: "{{ pwm_db_database }}", user: "{{ pwm_db_username }}", address: "172.17.0.0/16", auth_method: md5 }
     postgresql_pg_ident_entries:
+      - { mapname: dba, system_user: root, db_user: dba }
       - { mapname: dba, system_user: vagrant, db_user: dba }
       # ex) vagrant@idsvc $ psql -U dba postgres
     postgresql_users:
