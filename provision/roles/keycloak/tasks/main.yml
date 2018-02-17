@@ -1,5 +1,29 @@
 ---
 
+- name: Ensure keycloak volume base directory exists
+  file:
+    path: /srv/keycloak
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+
+- name: Ensure keycloak data directory exists
+  file:
+    path: /srv/keycloak/data
+    state: directory
+    owner: root
+    group: 1000
+    mode: 0770
+
+- name: Ensure keycloak log directory exists
+  file:
+    path: /srv/keycloak/log
+    state: directory
+    owner: root
+    group: 1000
+    mode: 0770
+
 - name: Copy Dockerfile
   synchronize:
     src: docker/
@@ -27,30 +51,6 @@
     state: present
     force: yes
 
-
-- name: Ensure keycloak volume base directory exists
-  file:
-    path: /srv/keycloak
-    state: directory
-    owner: root
-    group: root
-    mode: 0755
-
-- name: Ensure keycloak data directory exists
-  file:
-    path: /srv/keycloak/data
-    state: directory
-    owner: root
-    group: 1000
-    mode: 0770
-
-- name: Ensure keycloak log directory exists
-  file:
-    path: /srv/keycloak/log
-    state: directory
-    owner: root
-    group: 1000
-    mode: 0770
 
 - name: Provision
   script: provision.sh
