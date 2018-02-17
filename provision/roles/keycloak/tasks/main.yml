@@ -57,6 +57,14 @@
   args:
     creates: /srv/keycloak/data/keycloak.mv.db
 
+- name: Ensure keycloak truststore directory exists
+  file:
+    path: /srv/keycloak/truststore
+    owner: root
+    group: root
+    mode: 0755
+    state: directory
+
 
 - name: Install systemd environment file
   copy:
