@@ -18,11 +18,13 @@
 
     - name: Gather IPv4 DNS from Uplink interface
       shell: "nmcli dev show {{uplink_interface4}} | grep IP4.DNS | awk '{ print $NF }'"
+      changed_when: no
       register: nmcli_uplink_interface_dns4
       when: uplink_interface4 != ''
 
     - name: Gather IPv6 DNS from Uplink interface
       shell: "nmcli dev show {{uplink_interface6}} | grep IP6.DNS | awk '{ print $NF }'"
+      changed_when: no
       register: nmcli_uplink_interface_dns6
       when: uplink_interface6 != ''
 
