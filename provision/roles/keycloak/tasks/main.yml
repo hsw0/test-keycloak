@@ -41,16 +41,16 @@
     path: /srv/keycloak/data
     state: directory
     owner: root
-    group: root
-    mode: 01777  # FIXME: 최소 퍼미션
+    group: 1000
+    mode: 0770
 
 - name: Ensure keycloak log directory exists
   file:
     path: /srv/keycloak/log
     state: directory
     owner: root
-    group: root
-    mode: 01777  # FIXME
+    group: 1000
+    mode: 0770
 
 - name: Provision
   script: provision.sh
