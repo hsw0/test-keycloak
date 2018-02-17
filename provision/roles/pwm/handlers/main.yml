@@ -1,0 +1,11 @@
+---
+
+- name: Restart pwm
+  service:
+    name: pwm
+    state: restarted
+
+- name: Reload systemd
+  systemd:
+    daemon_reload: yes
+

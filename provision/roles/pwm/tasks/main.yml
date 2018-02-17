@@ -18,6 +18,7 @@
     archive: yes
     rsync_opts:
       - "--exclude='.*.sw[a-p]'"
+  notify: Restart pwm
 
 - name: Pull pwm base image
   docker_image:
@@ -48,6 +49,7 @@
     owner: root
     group: root
     mode: 0644
+  notify: Restart pwm
 
 - name: Install systemd service
   template:
@@ -56,18 +58,16 @@
     owner: root
     group: root
     mode: 0644
-  register: systemd_unit_install
+  notify:
+    - Reload systemd
+    - Restart pwm
 
-- name: Reload systemd
-  systemd:
-    daemon_reload: yes
-  when: systemd_unit_install|changed
+- meta: flush_handlers
 
-- name: Start pwm service
+- name: Ensure pwm service is started
   service:
     name: pwm
-    state: restarted
-  register: start_pwm
+    state: started
 
 - name: Enable pwm service
   service:
