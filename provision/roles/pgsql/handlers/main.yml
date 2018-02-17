@@ -1,0 +1,12 @@
+---
+
+- name: Reload PostgreSQL
+  service:
+    name: "{{ postgresql_service }}"
+    state: reloaded
+  become: yes
+
+- name: Reload systemd
+  systemd:
+    daemon_reload: yes
+  become: yes

@@ -1,0 +1,17 @@
+#
+# {{ ansible_managed }}
+#
+# @see https://www.postgresql.org/docs/current/static/auth-pg-hba-conf.html
+# references: https://github.com/geerlingguy/ansible-role-postgresql
+#
+
+# PostgreSQL Client Authentication Configuration File
+# ===================================================
+#
+# local            database  user  auth-method  [auth-options]
+# host{,ssl,nossl} database  user  address  auth-method  [auth-options]
+
+
+{% for client in postgresql_hba_entries %}
+{{ client.type }} {{ client.database }} {{ client.user }} {{ client.address|default('') }} {{ client.ip_address|default('') }} {{ client.ip_mask|default('') }} {{ client.auth_method }} {{ client.auth_options|default("") }}
+{% endfor %}

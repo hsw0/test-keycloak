@@ -1,0 +1,18 @@
+---
+
+postgresql_version: "10.0"
+
+postgresql_pgdg_ver_code: "10"
+
+postgresql_pgdg_repo: "https://download.postgresql.org/pub/repos/yum/10/redhat/rhel-7-x86_64/pgdg-redhat10-10-2.noarch.rpm"
+
+postgresql_packages:
+  - postgresql10
+  - postgresql10-server
+  - postgresql10-libs
+  - postgresql10-contrib
+  - python-psycopg2
+postgresql_bin_path: "/usr/pgsql-{{postgresql_pgdg_ver_code}}/bin"
+postgresql_service: "postgresql-{{postgresql_pgdg_ver_code}}"
+
+postgresql_user: postgres

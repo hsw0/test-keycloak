@@ -1,0 +1,170 @@
+---
+
+- name: Initialize variables
+  set_fact:
+    postgresql_config: "{{ postgresql_config_defaults | combine(postgresql_config) }}"
+    postgresql_hba_entries: "{{ postgresql_hba_entries_defaults + postgresql_hba_entries }}"
+
+- name: Install PGDG repo
+  package:
+    name: "{{ postgresql_pgdg_repo }}"
+    state: present
+
+- name: Install EPEL repo
+  package:
+    name: epel-release
+    state: present
+
+
+- name: Ensure PostgreSQL packages are installed
+  package:
+    name: "{{ item }}"
+    state: present
+  with_items: "{{ postgresql_packages }}"
+
+- name: Create systemd unit override directory
+  file:
+    path: "/etc/systemd/system/{{ postgresql_service }}.service.d"
+    owner: root
+    group: root
+    mode: 0755
+    state: directory
+  become: yes
+
+- name: Create systemd unit override config
+  template:
+    src: systemd-override.conf.j2
+    dest: "/etc/systemd/system/{{ postgresql_service }}.service.d/local.conf"
+    owner: root
+    group: root
+    mode: 0644
+  notify: Reload systemd
+  become: yes
+
+- meta: flush_handlers
+
+
+- name: Ensure database cluster is initialized
+  command: "{{ postgresql_bin_path }}/postgresql-{{ postgresql_pgdg_ver_code }}-setup initdb {{ postgresql_service }}"
+  args:
+    creates: "{{ postgresql_pgdata }}/PG_VERSION"
+  environment:
+    PGSETUP_DEBUG: 1
+    PGSETUP_INITDB_OPTIONS: "--locale={{ postgresql_locale }}"
+  become: yes
+
+- name: Ensure log directory exists
+  file:
+    path: "{{ postgresql_config['log_directory'] }}"
+    owner: "{{ postgresql_user }}"
+    group: adm
+    mode: 0750
+    state: directory
+  become: yes
+
+- name: Ensure config directory exists
+  file:
+    path: "{{ postgresql_pgdata }}/conf.d"
+    owner: root
+    group: postgres
+    mode: 0750
+    state: directory
+  become: yes
+
+- name: Configure local postgresql.conf
+  template:
+    src: postgresql-local.conf.j2
+    dest: "{{ postgresql_pgdata }}/conf.d/local.conf"
+    owner: root
+    group: postgres
+    mode: 0640
+  become: yes
+  notify: Reload PostgreSQL
+
+- name: Configure global postgresql.conf
+  lineinfile:
+    path: "{{ postgresql_pgdata }}/postgresql.conf"
+    regexp: "^#?\\s*{{ item.option }}\\s*=\\s*'"
+    line: "{{ item.option }} = '{{ item.value }}'"
+    state: present
+  with_items:
+    - option: "include_dir"
+      value: "conf.d"
+  notify: Reload PostgreSQL
+  become: yes
+
+- name: Configure pg_hba.conf
+  template:
+    src: pg_hba.conf.j2
+    dest: "{{ postgresql_pgdata }}/pg_hba.conf"
+    owner: root
+    group: postgres
+    mode: 0640
+  become: yes
+  notify: Reload PostgreSQL
+
+- name: Configure pg_ident.conf
+  template:
+    src: pg_ident.conf.j2
+    dest: "{{ postgresql_pgdata }}/pg_ident.conf"
+    owner: root
+    group: postgres
+    mode: 0640
+  become: yes
+  notify: Reload PostgreSQL
+
+
+- meta: flush_handlers
+
+- name: Ensure PostgreSQL service is started
+  service:
+    name: "{{ postgresql_service }}"
+    state: started
+  become: yes
+
+- name: Ensure PostgreSQL service is active
+  service:
+    name: "{{ postgresql_service }}"
+    enabled: yes
+  become: yes
+
+# references https://github.com/geerlingguy/ansible-role-postgresql/blob/1.3.1/tasks/users.yml
+- name: Ensure PostgreSQL users are present.
+  postgresql_user:
+    name: "{{ item.name }}"
+    password: "{{ item.password | default(omit) }}"
+    encrypted: yes
+    priv: "{{ item.priv | default(omit) }}"
+    role_attr_flags: "{{ item.role_attr_flags | default(omit) }}"
+    db: "{{ item.db | default(omit) }}"
+    login_user: "{{ postgresql_user }}"
+    login_unix_socket: "/var/run/postgresql"
+    state: "{{ item.state | default('present') }}"
+  with_items: "{{ postgresql_users }}"
+  no_log: true
+  become: yes
+  become_user: "{{ postgresql_user }}"
+  # See: https://github.com/ansible/ansible/issues/16048#issuecomment-229012509
+  vars:
+    ansible_ssh_pipelining: true
+
+# https://github.com/geerlingguy/ansible-role-postgresql/blob/1.3.1/tasks/databases.yml
+- name: Ensure PostgreSQL databases are present.
+  postgresql_db:
+    name: "{{ item.name }}"
+    lc_collate: "{{ item.lc_collate | default('en_US.UTF-8') }}"
+    lc_ctype: "{{ item.lc_ctype | default('en_US.UTF-8') }}"
+    encoding: "{{ item.encoding | default('UTF-8') }}"
+    template: "{{ item.template | default('template0') }}"
+    login_user: "{{ postgresql_user }}"
+    login_unix_socket: "/var/run/postgresql"
+    owner: "{{ item.owner | default(postgresql_user) }}"
+    state: "{{ item.state | default('present') }}"
+  with_items: "{{ postgresql_databases }}"
+  become: yes
+  become_user: "{{ postgresql_user }}"
+  # See: https://github.com/ansible/ansible/issues/16048#issuecomment-229012509
+  vars:
+    ansible_ssh_pipelining: true
+
+

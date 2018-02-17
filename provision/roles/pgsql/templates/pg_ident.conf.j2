@@ -1,0 +1,9 @@
+#
+# {{ ansible_managed }}
+#
+# @see https://www.postgresql.org/docs/current/static/auth-username-maps.html
+#
+# MAPNAME       SYSTEM-USERNAME         PG-USERNAME
+{% for item in postgresql_pg_ident_entries %}
+{{ item.mapname }}  {{ item.system_user }} {{ item.db_user }}
+{% endfor %}

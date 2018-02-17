@@ -1,0 +1,5 @@
+# {{ ansible_managed }}
+
+{% for option, value in postgresql_config.items() %}
+{{option}} = '{{ value }}'
+{% endfor %}
