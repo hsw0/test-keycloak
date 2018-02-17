@@ -43,6 +43,7 @@
     archive: yes
     rsync_opts:
       - "--exclude='.*.sw[a-p]'"
+  notify: Restart keycloak
 
 
 - name: Pull keycloak base image
@@ -77,6 +78,7 @@
     owner: root
     group: root
     mode: 0600
+  notify: Restart keycloak
 
 - name: Install systemd service
   template:
@@ -85,32 +87,17 @@
     owner: root
     group: root
     mode: 0644
-  register: systemd_unit_install
+  notify:
+    - Reload systemd
+    - Restart keycloak
 
-- name: Reload systemd
-  systemd:
-    daemon_reload: yes
-  when: systemd_unit_install|changed
+- meta: flush_handlers
 
-- name: Start keycloak service
+- name: Ensure keycloak service is started
   service:
     name: keycloak
-    state: restarted
-  register: start_keycloak
-
-- name: Wait for Keycloak to start up
-  uri:
-    url: "http://127.0.0.1:{{ keycloak_port }}/auth/realms/master"
-    status_code: 200
-    timeout: 5
-  register: service_status
-  # Keep trying for 5 mins in 5 sec intervals
-  retries: 60
-  delay: 5
-  until: >
-     'status' in service_status and
-     service_status['status'] == 200
-  when: start_keycloak|changed
+    state: started
+  notify: Wait for Keycloak to start up
 
 - name: Enable keycloak service
   service:

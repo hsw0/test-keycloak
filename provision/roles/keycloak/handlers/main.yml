@@ -1,0 +1,25 @@
+---
+
+- name: Restart keycloak
+  service:
+    name: keycloak
+    state: restarted
+  notify: Wait for Keycloak to start up
+
+- name: Wait for Keycloak to start up
+  uri:
+    url: "http://127.0.0.1:{{ keycloak_port }}/auth/realms/master"
+    status_code: 200
+    timeout: 5
+  register: service_status
+  # Keep trying for 5 mins in 5 sec intervals
+  retries: 60
+  delay: 5
+  until: >
+     'status' in service_status and
+     service_status['status'] == 200
+
+- name: Reload systemd
+  systemd:
+    daemon_reload: yes
+
