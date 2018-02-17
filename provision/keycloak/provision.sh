@@ -25,6 +25,7 @@ echo "Password: $admin_password"
 echo "Launching provisioning container"
 
 docker run --rm --name "$PROVISION_CONTAINER_NAME" \
+	--env-file=/etc/sysconfig/keycloak \
 	--env KEYCLOAK_USER=admin \
 	--env "KEYCLOAK_PASSWORD=$admin_password" \
 	--volume /srv/keycloak/data:/opt/jboss/keycloak/standalone/data \

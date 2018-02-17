@@ -13,6 +13,7 @@ ExecStartPre=-/usr/bin/docker rm %n
 ExecStart=/usr/bin/docker run \
  --name %n \
  --env PROXY_ADDRESS_FORWARDING=true \
+ --env-file=/etc/sysconfig/keycloak \
  --volume /srv/keycloak/data:/opt/jboss/keycloak/standalone/data \
  --volume /srv/keycloak/truststore:/opt/jboss/keycloak/standalone/configuration/truststore \
  --publish=127.0.0.1:${KEYCLOAK_PORT}:8080 \

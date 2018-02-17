@@ -61,14 +61,22 @@
     force: yes
 
 
-- name: Install systemd environment file
+- name: Configure service environment file
   copy:
     dest: /etc/sysconfig/keycloak
     content: |
       KEYCLOAK_PORT={{ keycloak_port }}
+
+      POSTGRES_PORT_5432_TCP_ADDR={{ keycloak_db_hostname }}
+      POSTGRES_ADDR={{ keycloak_db_hostname }}
+      POSTGRES_PORT_5432_TCP_PORT=5432
+      POSTGRES_PORT=5432
+      POSTGRES_USER={{ keycloak_db_username }}
+      POSTGRES_PASSWORD={{ keycloak_db_password }}
+      POSTGRES_DB={{ keycloak_db_database }}
     owner: root
     group: root
-    mode: 0644
+    mode: 0600
 
 - name: Install systemd service
   template:
