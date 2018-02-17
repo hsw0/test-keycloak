@@ -22,9 +22,21 @@
     docker_daemon_config:
       # https://github.com/moby/moby/issues/23910
       dns: [ "172.17.0.1" ]
+    postgresql_config:
+      listen_addresses: '*'
+    postgresql_hba_entries:
+      - { type: local, database: all, user: dba, auth_method: peer, auth_options: "map=dba" }
+    postgresql_pg_ident_entries:
+      - { mapname: dba, system_user: vagrant, db_user: dba }
+      # ex) vagrant@idsvc $ psql -U dba postgres
+    postgresql_users:
+      - name: dba
+        role_attr_flags: SUPERUSER
+    postgresql_databases: []
   roles:
     - nginx_proxy
     - docker_host
+    - pgsql
     - keycloak
     - pwm
 
