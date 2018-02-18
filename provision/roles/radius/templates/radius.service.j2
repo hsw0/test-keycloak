@@ -1,0 +1,27 @@
+# {{ansible_managed}}
+
+[Unit]
+Description=Radius service
+After=docker.service
+Requires=docker.service
+
+[Service]
+EnvironmentFile=-/etc/sysconfig/radius
+ExecStartPre=-/usr/bin/docker stop %n
+ExecStartPre=-/usr/bin/docker rm %n
+ExecStart=/usr/bin/docker run \
+ --name %n \
+ --env-file=/etc/sysconfig/radius \
+ --volume /srv/radius/data:/data \
+ --publish=${RADIUS_PORT}:1812/udp \
+ --publish=${RADIUS_ACCT_PORT}:1813/udp \
+ local/radius:latest
+ExecStop=-/usr/bin/docker stop %n
+ExecStopPost=-/usr/bin/docker rm %n
+TimeoutStartSec=0
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+

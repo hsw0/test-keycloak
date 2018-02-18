@@ -1,0 +1,104 @@
+---
+
+- name: Ensure freeradius volume base directory exists
+  file:
+    path: /srv/radius
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+  become: yes
+
+- name: Ensure freeradius data directory exists
+  file:
+    path: /srv/radius/data
+    state: directory
+    owner: root
+    group: 1000
+    mode: 0770
+  become: yes
+
+- name: Ensure freeradius log directory exists
+  file:
+    path: /srv/radius/log
+    state: directory
+    owner: root
+    group: 1000
+    mode: 0770
+  become: yes
+
+
+- name: Copy Dockerfile
+  synchronize:
+    src: docker/
+    dest: /srv/radius/docker/
+    owner: no
+    group: no
+    delete: yes
+    archive: yes
+    rsync_opts:
+      - "--exclude='.*.sw[a-p]'"
+  notify: Restart radius
+  become: yes
+
+
+- name: Pull freeradius base image
+  docker_image:
+    name: "centos:7"
+    pull: yes
+  become: yes
+
+- name: Build custom freeradius image
+  docker_image:
+    path: /srv/radius/docker
+    name: local/radius
+    tag: latest
+    state: present
+    force: yes
+  become: yes
+
+
+- name: Configure service environment file
+  copy:
+    dest: /etc/sysconfig/radius
+    content: |
+      RADIUS_PORT=1812
+      RADIUS_ACCT_PORT=1813
+
+      DB_ADDR={{ radius_db_hostname }}
+      DB_PORT=5432
+      DB_USER={{ radius_db_username }}
+      DB_PASSWORD={{ radius_db_password }}
+      DB_DB={{ radius_db_database }}
+    owner: root
+    group: root
+    mode: 0600
+  notify: Restart radius
+  become: yes
+
+- name: Install systemd service
+  template:
+    src: radius.service.j2
+    dest: /etc/systemd/system/radius.service
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - Reload systemd
+    - Restart radius
+  become: yes
+
+- meta: flush_handlers
+
+- name: Ensure freeradius service is started
+  service:
+    name: radius
+    state: started
+  become: yes
+
+- name: Enable freeradius service
+  service:
+    name: radius
+    enabled: yes
+  become: yes
+
