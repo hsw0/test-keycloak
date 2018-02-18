@@ -27,6 +27,10 @@
     pwm_db_username: svc_pwm
     pwm_db_password: pwm
     pwm_db_database: pwm
+    radius_db_hostname: 172.17.0.1
+    radius_db_username: svc_radius
+    radius_db_password: radius
+    radius_db_database: radius
     docker_daemon_config:
       # https://github.com/moby/moby/issues/23910
       dns: [ "172.17.0.1" ]
@@ -36,6 +40,7 @@
       - { type: local, database: all, user: dba, auth_method: peer, auth_options: "map=dba" }
       - { type: host, database: "{{ keycloak_db_database }}", user: "{{ keycloak_db_username }}", address: "172.17.0.0/16", auth_method: md5 }
       - { type: host, database: "{{ pwm_db_database }}", user: "{{ pwm_db_username }}", address: "172.17.0.0/16", auth_method: md5 }
+      - { type: host, database: "{{ radius_db_database }}", user: "{{ radius_db_username }}", address: "172.17.0.0/16", auth_method: md5 }
     postgresql_pg_ident_entries:
       - { mapname: dba, system_user: root, db_user: dba }
       - { mapname: dba, system_user: vagrant, db_user: dba }
@@ -47,10 +52,14 @@
         password: "{{ keycloak_db_password }}"
       - name: "{{ pwm_db_username }}"
         password: "{{ pwm_db_password }}"
+      - name: "{{ radius_db_username }}"
+        password: "{{ radius_db_password }}"
     postgresql_databases:
       - name: "{{ keycloak_db_database }}"
         owner: "{{ keycloak_db_username }}"
       - name: "{{ pwm_db_database }}"
+        owner: dba
+      - name: "{{ radius_db_database }}"
         owner: dba
   roles:
     - nginx_proxy
@@ -58,6 +67,7 @@
     - pgsql
     - keycloak
     - pwm
+    - radius
   tasks:
     - name: Download Google CA Certificate
       get_url:
@@ -101,6 +111,20 @@
         group: 999
         mode: 0600
         force: false
+
+    - name: Populate radius db schema
+      template:
+        src: radius/schema.pgsql.sql
+        dest: /srv/radius/schema.pgsql.sql
+        owner: root
+        group: root
+        mode: 0600
+      become: yes
+    - name: Populate radius db schema
+      shell: psql --username dba --dbname="{{ radius_db_database }}" --file=/srv/radius/schema.pgsql.sql && date > /srv/radius/data/.populate-schema.done
+      args:
+        creates: /srv/radius/data/.populate-schema.done
+      become: yes
 
 - hosts: examples
   vars:
