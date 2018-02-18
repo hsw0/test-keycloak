@@ -1,0 +1,4 @@
+#!/usr/bin/execlineb -P
+
+with-contenv
+/usr/sbin/radiusd -f -l stdout

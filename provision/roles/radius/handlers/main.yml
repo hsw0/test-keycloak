@@ -1,0 +1,13 @@
+---
+
+- name: Restart radius
+  service:
+    name: radius
+    state: restarted
+  become: yes
+
+- name: Reload systemd
+  systemd:
+    daemon_reload: yes
+  become: yes
+
